@@ -1,0 +1,1023 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+<title>Kodemap — Design System &amp; Screens</title>
+<style>
+  /* ============================ TOKENS ============================ */
+  :root {
+    --bg:        #0C0A08;
+    --bg-1:      #13100C;
+    --surface:   #17130E;
+    --surface-2: #201A13;
+    --border:    #2B231B;
+    --border-2:  #3A2F24;
+    --text:      #F4ECE2;
+    --dim:       #B7A896;
+    --muted:     #8A7C6A;
+
+    --primary:       #F65F2E;
+    --primary-hover: #FF7548;
+    --primary-press: #DE4E22;
+    --on-primary:    #1B0E06;
+    --primary-soft:  rgba(246,95,46,.14);
+    --primary-line:  rgba(246,95,46,.38);
+
+    --tan:      #CBA47D;
+    --tan-soft: rgba(203,164,125,.14);
+
+    --success:  #4CB98A; --success-soft: rgba(76,185,138,.14);
+    --warn:     #E2A63E; --warn-soft:    rgba(226,166,62,.14);
+    --danger:   #E9564C; --danger-soft:  rgba(233,86,76,.14);
+
+    --d-vezy: #4CB98A; --d-easy: #86BB4B; --d-med: #E2A63E; --d-hard: #F65F2E; --d-chal: #D6455B;
+
+    --shadow: 0 1px 0 rgba(255,255,255,.02) inset, 0 8px 24px -12px rgba(0,0,0,.7);
+    --radius: 14px;
+    --radius-sm: 9px;
+
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: light) { :root:not([data-theme]) { color-scheme: light;
+    --bg:#F1EADF; --bg-1:#EBE2D4; --surface:#FFFFFF; --surface-2:#F8F3EB;
+    --border:#E7DBCA; --border-2:#D8C8B2; --text:#241C13; --dim:#5C5142; --muted:#867868;
+    --primary:#E24E1B; --primary-hover:#C8410F; --primary-press:#B23A0D; --on-primary:#FFFFFF;
+    --primary-soft:rgba(226,78,27,.10); --primary-line:rgba(226,78,27,.30);
+    --tan:#A9825B; --tan-soft:rgba(169,130,91,.14);
+    --success:#2E9E6E; --success-soft:rgba(46,158,110,.12);
+    --warn:#B9821B; --warn-soft:rgba(185,130,27,.14);
+    --danger:#CF3E33; --danger-soft:rgba(207,62,51,.12);
+    --d-vezy:#2E9E6E; --d-easy:#5E9A2A; --d-med:#B9821B; --d-hard:#E24E1B; --d-chal:#C13350;
+    --shadow: 0 1px 2px rgba(60,40,20,.04), 0 10px 26px -16px rgba(80,50,20,.28);
+  }}
+  :root[data-theme="dark"] { color-scheme: dark; }
+  :root[data-theme="light"] { color-scheme: light;
+    --bg:#F1EADF; --bg-1:#EBE2D4; --surface:#FFFFFF; --surface-2:#F8F3EB;
+    --border:#E7DBCA; --border-2:#D8C8B2; --text:#241C13; --dim:#5C5142; --muted:#867868;
+    --primary:#E24E1B; --primary-hover:#C8410F; --primary-press:#B23A0D; --on-primary:#FFFFFF;
+    --primary-soft:rgba(226,78,27,.10); --primary-line:rgba(226,78,27,.30);
+    --tan:#A9825B; --tan-soft:rgba(169,130,91,.14);
+    --success:#2E9E6E; --success-soft:rgba(46,158,110,.12);
+    --warn:#B9821B; --warn-soft:rgba(185,130,27,.14);
+    --danger:#CF3E33; --danger-soft:rgba(207,62,51,.12);
+    --d-vezy:#2E9E6E; --d-easy:#5E9A2A; --d-med:#B9821B; --d-hard:#E24E1B; --d-chal:#C13350;
+    --shadow: 0 1px 2px rgba(60,40,20,.04), 0 10px 26px -16px rgba(80,50,20,.28);
+  }
+
+  /* ============================ BASE ============================ */
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.55; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  a { color: inherit; }
+  .mono { font-family: var(--mono); }
+  .num { font-variant-numeric: tabular-nums; font-family: var(--mono); }
+  h1,h2,h3 { margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+  ::selection { background: var(--primary-soft); }
+  :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 6px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  /* ============================ CHROME ============================ */
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 22px clamp(14px, 3vw, 28px) 64px; }
+  .masthead { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+  .brand { display: flex; align-items: center; gap: 11px; }
+  /* Placeholder logo tile — swap for real brand asset when provided. */
+  .glyph { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: var(--surface-2); border: 1px dashed var(--border-2); color: var(--muted); flex: none; }
+  .glyph svg { width: 18px; height: 18px; }
+  .wordmark { font-family: var(--mono); font-weight: 700; font-size: 18px; letter-spacing: -.02em; }
+  .wordmark b { color: var(--primary); font-weight: 700; }
+  .tagline { font-size: 12px; color: var(--muted); font-family: var(--mono); letter-spacing: .02em; }
+
+  .toggle { display: inline-flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); color: var(--dim); border-radius: 999px; padding: 7px 13px 7px 11px; font: inherit; font-size: 13px; cursor: pointer; }
+  .toggle:hover { border-color: var(--border-2); color: var(--text); }
+  .toggle svg { width: 15px; height: 15px; }
+
+  /* environment switch (top level) */
+  .envbar { display: inline-flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 5px; margin-bottom: 12px; }
+  .env { border: 0; background: transparent; color: var(--dim); font: inherit; font-size: 13.5px; font-weight: 600; padding: 9px 15px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .env svg { width: 15px; height: 15px; opacity: .85; }
+  .env:hover { color: var(--text); }
+  .env.is-on { background: var(--primary); color: var(--on-primary); }
+
+  /* sub-nav (learner screens) */
+  .switcher { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 5px; margin-bottom: 20px; overflow-x: auto; }
+  .switcher[hidden] { display: none; }
+  .seg { flex: 1 0 auto; border: 0; background: transparent; color: var(--dim); font: inherit; font-size: 13.5px; font-weight: 550; padding: 9px 14px; border-radius: 8px; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; }
+  .seg svg { width: 15px; height: 15px; opacity: .8; }
+  .seg:hover { color: var(--text); }
+  .seg[aria-selected="true"] { background: var(--primary-soft); color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary-line); }
+
+  .screen { display: none; animation: rise .28s ease both; }
+  .screen.is-active { display: block; }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* ============================ APP SHELL ============================ */
+  .app { border: 1px solid var(--border); border-radius: 18px; overflow: hidden; background: var(--bg-1); box-shadow: var(--shadow); }
+  .appbar { display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .appbar .spacer { flex: 1; }
+  .stat { display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border-radius: 999px; border: 1px solid var(--border); background: var(--bg); font-family: var(--mono); font-size: 13px; }
+  .stat svg { width: 15px; height: 15px; }
+  .stat.flame { color: var(--primary); border-color: var(--primary-line); background: var(--primary-soft); }
+  .stat.pts   { color: var(--tan); }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--tan), var(--primary)); display: grid; place-items: center; color: #1b0e06; font-weight: 700; font-size: 12px; font-family: var(--mono); flex: none; }
+
+  .body { display: grid; grid-template-columns: 210px 1fr; min-height: 560px; }
+  .side { border-right: 1px solid var(--border); padding: 14px 12px; display: flex; flex-direction: column; gap: 3px; background: var(--surface); }
+  .side .cap { font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding: 12px 10px 6px; }
+  .nav { display: flex; align-items: center; gap: 11px; padding: 9px 11px; border-radius: 10px; color: var(--dim); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid transparent; }
+  .nav svg { width: 17px; height: 17px; flex: none; }
+  .nav:hover { color: var(--text); background: var(--bg); }
+  .nav.active { color: var(--primary); background: var(--primary-soft); border-color: var(--primary-line); }
+  .side .grow { flex: 1; }
+  .side .mini { display: flex; align-items: center; gap: 9px; padding: 9px; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+
+  .main { padding: clamp(16px, 2.4vw, 26px); overflow-x: auto; }
+  .main.dense { padding: clamp(14px, 2vw, 20px); }
+  .crumb { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .h-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 4px; }
+  .page-title { font-size: clamp(21px, 3vw, 27px); font-weight: 700; }
+  .lede { color: var(--dim); font-size: 14px; margin: 6px 0 20px; max-width: 60ch; }
+
+  /* ============================ COMPONENTS ============================ */
+  .btn { font: inherit; font-weight: 600; font-size: 14px; border-radius: 10px; padding: 10px 16px; cursor: pointer; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 8px; }
+  .btn svg { width: 16px; height: 16px; }
+  .btn-primary { background: var(--primary); color: var(--on-primary); }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-primary:active { background: var(--primary-press); }
+  .btn-ghost { background: var(--surface-2); color: var(--text); border-color: var(--border-2); }
+  .btn-ghost:hover { border-color: var(--tan); color: var(--tan); }
+  .btn-quiet { background: transparent; color: var(--dim); border-color: var(--border); }
+  .btn-quiet:hover { color: var(--text); border-color: var(--border-2); }
+  .btn.sm { padding: 8px 12px; font-size: 13px; }
+
+  .badge { font-family: var(--mono); font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 7px; display: inline-flex; align-items: center; gap: 6px; letter-spacing: .01em; }
+  .badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .b-vezy { color: var(--d-vezy); background: color-mix(in srgb, var(--d-vezy) 14%, transparent); }
+  .b-easy { color: var(--d-easy); background: color-mix(in srgb, var(--d-easy) 14%, transparent); }
+  .b-med  { color: var(--d-med);  background: color-mix(in srgb, var(--d-med) 14%, transparent); }
+  .b-hard { color: var(--d-hard); background: color-mix(in srgb, var(--d-hard) 14%, transparent); }
+  .b-chal { color: var(--d-chal); background: color-mix(in srgb, var(--d-chal) 14%, transparent); }
+
+  .pill { font-family: var(--mono); font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; }
+  .pill svg { width: 12px; height: 12px; }
+  .p-ok   { color: var(--success); background: var(--success-soft); }
+  .p-warn { color: var(--warn); background: var(--warn-soft); }
+  .p-bad  { color: var(--danger); background: var(--danger-soft); }
+  .p-run  { color: var(--tan); background: var(--tan-soft); }
+
+  .tag { font-family: var(--mono); font-size: 11.5px; color: var(--muted); border: 1px solid var(--border); padding: 3px 8px; border-radius: 7px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  .progress { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+  .progress > i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--tan), var(--primary)); }
+
+  /* ---------- ROADMAP ---------- */
+  .track-head { padding: 20px; margin-bottom: 18px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .track-head .txt { flex: 1 1 260px; }
+  .track-head h2 { font-size: 20px; }
+  .track-head .meta { color: var(--muted); font-size: 13px; margin-top: 3px; }
+  .ring { --p: 42; width: 78px; height: 78px; border-radius: 50%; flex: none; display: grid; place-items: center; position: relative; background: conic-gradient(var(--primary) calc(var(--p) * 1%), var(--surface-2) 0); }
+  .ring::after { content: ""; position: absolute; width: 60px; height: 60px; border-radius: 50%; background: var(--surface); }
+  .ring b { position: relative; font-family: var(--mono); font-weight: 700; font-size: 17px; }
+
+  .module { margin-bottom: 14px; overflow: hidden; }
+  .module > .m-head { display: flex; align-items: center; gap: 13px; padding: 14px 16px; }
+  .m-ic { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; flex: none; background: var(--surface-2); color: var(--tan); }
+  .m-ic svg { width: 18px; height: 18px; }
+  .m-head .m-t { flex: 1; }
+  .m-head .m-t b { font-size: 15px; }
+  .m-head .m-t p { margin: 1px 0 0; font-size: 12.5px; color: var(--muted); }
+  .m-head .count { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .lessons { border-top: 1px solid var(--border); }
+  .lesson { display: flex; align-items: center; gap: 13px; padding: 12px 16px 12px 18px; border-bottom: 1px solid var(--border); }
+  .lesson:last-child { border-bottom: 0; }
+  .l-state { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+  .l-state svg { width: 14px; height: 14px; }
+  .st-done { background: var(--success-soft); color: var(--success); }
+  .st-cur  { background: var(--primary); color: var(--on-primary); }
+  .st-lock { background: var(--surface-2); color: var(--muted); }
+  .lesson .l-t { flex: 1; font-size: 14px; }
+  .lesson .l-t small { display: block; color: var(--muted); font-size: 12px; font-family: var(--mono); margin-top: 1px; }
+  .lesson.locked .l-t { color: var(--muted); }
+  .module.locked { opacity: .62; }
+  .qlist { margin: 2px 0 0; padding: 0 16px 14px 55px; display: flex; flex-direction: column; gap: 7px; }
+  .q-row { display: flex; align-items: center; gap: 11px; padding: 9px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; font-size: 13.5px; }
+  .q-row .dot { width: 15px; height: 15px; border-radius: 50%; flex: none; display: grid; place-items: center; }
+  .q-row .dot svg { width: 10px; height: 10px; }
+  .q-row .q-n { flex: 1; }
+  .q-row .q-n b { font-weight: 550; }
+  .q-row.solved .q-n b { color: var(--dim); }
+
+  /* ---------- SOLVE ---------- */
+  .solve { display: grid; grid-template-columns: 1fr 1.1fr; gap: 16px; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+  .prob-title { font-size: 19px; font-weight: 700; margin-bottom: 9px; }
+  .prob-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .prob h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); font-family: var(--mono); margin: 18px 0 7px; font-weight: 600; }
+  .prob p { font-size: 14px; color: var(--dim); margin: 0; }
+  .io { font-family: var(--mono); font-size: 12.5px; background: var(--bg); border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; color: var(--dim); white-space: pre; overflow-x: auto; }
+  .cases { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .case-l { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .editor-wrap { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .editor-bar { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+  .lang { font-family: var(--mono); font-size: 12.5px; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; display: inline-flex; align-items: center; gap: 7px; }
+  .lang .chev { color: var(--muted); }
+  .editor { display: grid; grid-template-columns: 40px 1fr; font-family: var(--mono); font-size: 13px; line-height: 1.7; background: var(--bg); min-height: 244px; }
+  .gutter { text-align: right; padding: 12px 8px; color: var(--muted); user-select: none; border-right: 1px solid var(--border); }
+  .code { padding: 12px 14px; overflow-x: auto; white-space: pre; margin: 0; color: var(--text); }
+  .k { color: var(--primary); } .fn { color: var(--tan); } .s { color: var(--success); } .c { color: var(--muted); font-style: italic; } .n { color: #d98b6a; }
+  .editor-foot { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-top: 1px solid var(--border); background: var(--surface); }
+  .editor-foot .spacer { flex: 1; }
+  .result { margin-top: 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+  .result .r-head { padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+  .result .r-head .verdict { font-family: var(--mono); font-weight: 700; font-size: 14px; }
+  .result .r-body { padding: 12px 16px; display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+  .r-metric { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+  .r-metric b { color: var(--text); }
+  .dots { display: flex; gap: 5px; flex-wrap: wrap; }
+  .tdot { width: 13px; height: 13px; border-radius: 4px; background: var(--surface-2); }
+  .tdot.pass { background: var(--success); }
+  .tdot.fail { background: var(--danger); }
+  .tdot.wait { background: var(--warn); animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:.35} 50%{opacity:1} }
+
+  /* ---------- LEADERBOARD ---------- */
+  .lb-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+  .lb-tab { font: inherit; font-size: 13px; font-weight: 550; padding: 8px 14px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface); color: var(--dim); cursor: pointer; }
+  .lb-tab.on { color: var(--primary); border-color: var(--primary-line); background: var(--primary-soft); }
+  .lb-table { width: 100%; border-collapse: collapse; }
+  .lb-table th { text-align: left; font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 8px 14px; border-bottom: 1px solid var(--border); }
+  .lb-table th.r, .lb-table td.r { text-align: right; }
+  .lb-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .lb-table tr:last-child td { border-bottom: 0; }
+  .rank { font-family: var(--mono); font-weight: 700; color: var(--muted); width: 30px; }
+  .rank.top { color: var(--primary); }
+  .who { display: flex; align-items: center; gap: 11px; }
+  .who .avatar { width: 32px; height: 32px; }
+  .who b { font-weight: 600; font-size: 14px; }
+  .who small { display: block; color: var(--muted); font-size: 12px; }
+  .me { background: var(--primary-soft); }
+  .me td:first-child { box-shadow: inset 3px 0 0 var(--primary); }
+  .flamecell { color: var(--primary); font-family: var(--mono); font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+  .flamecell svg { width: 14px; height: 14px; }
+
+  /* ---------- ADMIN CONSOLE ---------- */
+  .chip-tag { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--primary); background: var(--primary-soft); border: 1px solid var(--primary-line); padding: 3px 7px; border-radius: 6px; }
+  .chip-role { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--tan); background: var(--tan-soft); border: 1px solid var(--border); padding: 4px 10px; border-radius: 999px; }
+  .searchbar { flex: 1; max-width: 320px; display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 9px; padding: 7px 11px; color: var(--muted); font-size: 13px; font-family: var(--mono); }
+  .searchbar svg { width: 15px; height: 15px; flex: none; }
+  .admin-side .nav[data-page] { cursor: pointer; }
+  .admin-page { display: none; }
+  .admin-page.is-on { display: block; animation: rise .24s ease both; }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px; }
+  .kpi .k-l { font-family: var(--mono); font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+  .kpi .k-v { font-size: 23px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; letter-spacing: -.02em; }
+  .kpi .k-d { font-size: 11.5px; font-family: var(--mono); margin-top: 1px; display: inline-flex; gap: 4px; align-items: center; }
+  .k-up { color: var(--success); } .k-dn { color: var(--danger); }
+  .kpi .spark { display: block; margin-top: 9px; width: 100%; height: 26px; }
+
+  .dash-2 { display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .panelcard { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 15px 16px; }
+  .panelcard .pc-h { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; gap: 10px; }
+  .panelcard .pc-h h3 { font-size: 14px; }
+  .panelcard .pc-h span { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .barchart { display: flex; align-items: flex-end; gap: 4px; height: 128px; }
+  .bar { flex: 1; background: var(--tan); border-radius: 4px 4px 0 0; min-height: 4px; opacity: .82; }
+  .bar.today { background: var(--primary); opacity: 1; }
+  .barx { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 8px; }
+  .dist { display: flex; height: 16px; border-radius: 8px; overflow: hidden; gap: 2px; }
+  .dist > span { display: block; }
+  .legend { display: flex; flex-direction: column; gap: 9px; margin-top: 15px; }
+  .legend .lg { display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: var(--dim); }
+  .legend .lg .sw2 { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .legend .lg b { margin-left: auto; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--text); }
+
+  .toolbar { display: flex; align-items: center; gap: 9px; margin-bottom: 13px; flex-wrap: wrap; }
+  .toolbar .search-in { flex: 1; min-width: 180px; display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 9px; padding: 8px 11px; color: var(--muted); font-size: 13px; font-family: var(--mono); }
+  .toolbar .search-in svg { width: 15px; height: 15px; flex: none; }
+  .filter { font-family: var(--mono); font-size: 12px; color: var(--dim); background: var(--surface); border: 1px solid var(--border); border-radius: 9px; padding: 8px 11px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; white-space: nowrap; }
+  .filter svg { width: 13px; height: 13px; color: var(--muted); }
+
+  .dtable { width: 100%; border-collapse: collapse; }
+  .dtable th { text-align: left; font-family: var(--mono); font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 9px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .dtable td { padding: 11px 12px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+  .dtable tr:last-child td { border-bottom: 0; }
+  .dtable td.r, .dtable th.r { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); }
+  .dtable tbody tr:hover { background: var(--bg); }
+  .who2 { display: flex; align-items: center; gap: 10px; }
+  .who2 .avatar { width: 30px; height: 30px; }
+  .who2 b { font-weight: 600; }
+  .who2 small { display: block; color: var(--muted); font-size: 11.5px; font-family: var(--mono); }
+  .rolechip { font-family: var(--mono); font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
+  .role-l { color: var(--tan); background: var(--tan-soft); }
+  .role-a { color: var(--primary); background: var(--primary-soft); }
+  .role-s { color: var(--success); background: var(--success-soft); }
+  .status-dot { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 12px; }
+  .status-dot i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; display: inline-block; }
+  .iconbtn { background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 5px; color: var(--muted); cursor: pointer; display: inline-grid; place-items: center; }
+  .iconbtn:hover { color: var(--text); border-color: var(--border-2); }
+  .iconbtn svg { width: 15px; height: 15px; }
+
+  /* ---------- ADMIN QUESTION EDITOR ---------- */
+  .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 13px; }
+  .field label { font-size: 12px; font-family: var(--mono); color: var(--dim); letter-spacing: .02em; }
+  .field .in { background: var(--bg); border: 1px solid var(--border); border-radius: 9px; padding: 9px 11px; color: var(--text); font: inherit; font-size: 13.5px; }
+  .field .in.mono { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+  .field textarea.in { min-height: 92px; resize: vertical; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .select { position: relative; }
+  .select .in { appearance: none; width: 100%; }
+  .select svg { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--muted); pointer-events: none; }
+  .dropzone { border: 1.5px dashed var(--border-2); border-radius: var(--radius); padding: 22px; text-align: center; background: var(--bg); }
+  .dropzone svg { width: 30px; height: 30px; color: var(--tan); }
+  .dropzone b { display: block; margin: 9px 0 3px; font-size: 14px; }
+  .dropzone span { font-size: 12.5px; color: var(--muted); font-family: var(--mono); }
+  .tc-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-family: var(--mono); font-size: 12px; }
+  .tc-table th { text-align: left; color: var(--muted); font-weight: 600; padding: 7px 10px; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: .06em; font-size: 10px; }
+  .tc-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--dim); white-space: nowrap; }
+  .tc-table .s-flag { color: var(--tan); }
+  .tc-table .h-flag { color: var(--muted); }
+  .editor-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .tc-add { display: grid; grid-template-columns: 1fr 1fr 116px auto; gap: 8px; margin-top: 12px; align-items: center; }
+  .tc-add .in { padding: 8px 10px; }
+  @media (max-width: 520px) { .tc-add { grid-template-columns: 1fr 1fr; } }
+
+  /* ---------- STYLE GUIDE ---------- */
+  .sg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .sw { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface); }
+  .sw .chip { height: 66px; }
+  .sw .lab { padding: 9px 11px; }
+  .sw .lab b { font-size: 12.5px; display: block; }
+  .sw .lab code { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .block { margin-bottom: 26px; }
+  .block > h3 { font-size: 13px; font-family: var(--mono); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 12px; font-weight: 600; }
+  .type-row { display: flex; align-items: baseline; gap: 16px; padding: 11px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .type-row .meta { font-family: var(--mono); font-size: 11px; color: var(--muted); width: 130px; flex: none; }
+  .inline-set { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+  .note { display: flex; gap: 10px; align-items: flex-start; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--primary); border-radius: 10px; padding: 13px 15px; margin-top: 22px; font-size: 13.5px; color: var(--dim); }
+  .note svg { width: 17px; height: 17px; color: var(--primary); flex: none; margin-top: 1px; }
+  .note b { color: var(--text); }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 880px) {
+    .body { grid-template-columns: 1fr; }
+    .side { flex-direction: row; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid var(--border); align-items: center; }
+    .side .cap, .side .grow, .side .mini { display: none; }
+    .nav { padding: 8px 10px; }
+    .solve, .admin-grid { grid-template-columns: 1fr; }
+    .cases { grid-template-columns: 1fr; }
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .dash-2 { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div class="brand">
+      <span class="glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span>
+      <div>
+        <div class="wordmark">kode<b>map</b></div>
+        <div class="tagline">visual identity · dark-first · v0.3</div>
+      </div>
+    </div>
+    <button class="toggle" id="themeBtn" type="button" aria-label="Toggle theme">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <span id="themeLabel">Dark</span>
+    </button>
+  </header>
+
+  <!-- environment switch: shared login, then two separate app worlds -->
+  <div class="envbar" role="tablist" aria-label="Environment">
+    <button class="env" data-env="style" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2a10 10 0 1 0 0 20 2.5 2.5 0 0 0 2-4 2.5 2.5 0 0 1 2-4h1a4 4 0 0 0 4-4 10 10 0 0 0-9-8z"/></svg>Style guide</button>
+    <button class="env is-on" data-env="learner" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Learner app</button>
+    <button class="env" data-env="admin" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 4v6c0 4-3 7-7 8-4-1-7-4-7-8V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg>Admin console</button>
+  </div>
+
+  <!-- learner sub-nav -->
+  <nav class="switcher sub" id="sub-learner" role="tablist" aria-label="Learner screens">
+    <button class="seg" role="tab" data-screen="roadmap" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><circle cx="18" cy="5" r="3"/><path d="M6 16V9a4 4 0 0 1 4-4h4M18 8v3a4 4 0 0 1-4 4h-1"/></svg>Roadmap</button>
+    <button class="seg" role="tab" data-screen="solve" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 7 3 12 8 17"/><polyline points="16 7 21 12 16 17"/></svg>Solve</button>
+    <button class="seg" role="tab" data-screen="leaderboard" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>Leaderboard</button>
+  </nav>
+
+  <!-- ===================== STYLE GUIDE ===================== -->
+  <section class="screen" id="s-style" role="tabpanel">
+    <div class="crumb">design system / tokens</div>
+    <h1 class="page-title">The Ember system</h1>
+    <p class="lede">Warm coals on charcoal. A single reddish-orange does the shouting; ash-tan and warm neutrals keep everything else quiet. Monospace carries data because this is a place where people write code.</p>
+    <div class="block">
+      <h3>Core palette</h3>
+      <div class="sg-grid">
+        <div class="sw"><div class="chip" style="background:#0C0A08"></div><div class="lab"><b>Coal</b><code>#0C0A08</code></div></div>
+        <div class="sw"><div class="chip" style="background:#17130E"></div><div class="lab"><b>Surface</b><code>#17130E</code></div></div>
+        <div class="sw"><div class="chip" style="background:#F65F2E"></div><div class="lab"><b>Ember</b><code>#F65F2E</code></div></div>
+        <div class="sw"><div class="chip" style="background:#CBA47D"></div><div class="lab"><b>Ash-tan</b><code>#CBA47D</code></div></div>
+        <div class="sw"><div class="chip" style="background:#F4ECE2"></div><div class="lab"><b>Bone (text)</b><code>#F4ECE2</code></div></div>
+        <div class="sw"><div class="chip" style="background:#8A7C6A"></div><div class="lab"><b>Smoke (muted)</b><code>#8A7C6A</code></div></div>
+      </div>
+    </div>
+    <div class="block">
+      <h3>Semantic — verdicts (kept off the accent)</h3>
+      <div class="sg-grid">
+        <div class="sw"><div class="chip" style="background:#4CB98A"></div><div class="lab"><b>Accepted</b><code>#4CB98A</code></div></div>
+        <div class="sw"><div class="chip" style="background:#E2A63E"></div><div class="lab"><b>Time limit</b><code>#E2A63E</code></div></div>
+        <div class="sw"><div class="chip" style="background:#E9564C"></div><div class="lab"><b>Wrong answer</b><code>#E9564C</code></div></div>
+        <div class="sw"><div class="chip" style="background:#D6455B"></div><div class="lab"><b>Challenge</b><code>#D6455B</code></div></div>
+      </div>
+    </div>
+    <div class="block">
+      <h3>Type scale</h3>
+      <div class="type-row"><span class="meta">Display · 27 / 700</span><span style="font-size:27px;font-weight:700">Solve, unlock, climb.</span></div>
+      <div class="type-row"><span class="meta">Title · 19 / 700</span><span style="font-size:19px;font-weight:700">Sum of First N Numbers</span></div>
+      <div class="type-row"><span class="meta">Body · 14 / 400</span><span style="font-size:14px;color:var(--dim)">Read the statement, write your solution, run against the samples, then submit.</span></div>
+      <div class="type-row"><span class="meta">Mono label · 11 / 600</span><span class="mono" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">TIME LIMIT · 1000 MS</span></div>
+      <div class="type-row"><span class="meta">Data · mono</span><span class="num" style="font-size:16px">340 pts · 27 solved · 12 day streak</span></div>
+    </div>
+    <div class="block">
+      <h3>Buttons</h3>
+      <div class="inline-set">
+        <button class="btn btn-primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Submit</button>
+        <button class="btn btn-ghost" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 4 20 12 6 20 6 4"/></svg>Run</button>
+        <button class="btn btn-quiet" type="button">Reset</button>
+      </div>
+    </div>
+    <div class="block">
+      <h3>Difficulty &amp; verdict badges</h3>
+      <div class="inline-set" style="margin-bottom:12px">
+        <span class="badge b-vezy">Very Easy · 5</span>
+        <span class="badge b-easy">Easy · 10</span>
+        <span class="badge b-med">Medium · 20</span>
+        <span class="badge b-hard">Hard · 40</span>
+        <span class="badge b-chal">Challenge · 60</span>
+      </div>
+      <div class="inline-set">
+        <span class="pill p-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Accepted</span>
+        <span class="pill p-bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Wrong Answer</span>
+        <span class="pill p-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Time Limit</span>
+        <span class="pill p-run"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>In Queue</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LEARNER · ROADMAP ===================== -->
+  <section class="screen is-active" id="s-roadmap" role="tabpanel">
+    <div class="app">
+      <div class="appbar">
+        <div class="brand"><span class="glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span><div class="wordmark">kode<b>map</b></div></div>
+        <div class="spacer"></div>
+        <span class="stat flame"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 3-1 4-1 6a3 3 0 0 0 5 2c1 2 2 3 2 6a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 2 2 3 2 0-3-2-4-3-7z"/></svg>12</span>
+        <span class="stat pts">340 pts</span>
+        <span class="avatar">AL</span>
+      </div>
+      <div class="body">
+        <aside class="side">
+          <span class="cap">Learn</span>
+          <span class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</span>
+          <span class="nav active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><circle cx="18" cy="5" r="3"/><path d="M6 16V9a4 4 0 0 1 4-4h4M18 8v3a4 4 0 0 1-4 4h-1"/></svg>Roadmap</span>
+          <span class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z"/></svg>Leaderboard</span>
+          <span class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profile</span>
+          <span class="grow"></span>
+          <div class="mini"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--tan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 8 8 8 8s8-3 8-8V6z"/></svg>Undergraduate track</div>
+        </aside>
+        <main class="main">
+          <div class="crumb">tracks / dsa foundation</div>
+          <div class="card track-head">
+            <div class="ring" style="--p:42"><b>42%</b></div>
+            <div class="txt">
+              <h2>DSA Foundation</h2>
+              <div class="meta">10 modules · 84 must-do questions · unlocks LeetCode-Easy/Medium readiness</div>
+              <div class="progress" style="margin-top:12px"><i style="width:42%"></i></div>
+            </div>
+          </div>
+          <div class="card module">
+            <div class="m-head">
+              <span class="m-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M9 5v14"/></svg></span>
+              <div class="m-t"><b>Arrays</b><p>Indexing, traversal, in-place tricks</p></div>
+              <span class="count">6 / 6</span>
+              <span class="pill p-ok" style="margin-left:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Done</span>
+            </div>
+          </div>
+          <div class="card module">
+            <div class="m-head">
+              <span class="m-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h6M4 6h16M4 18h10"/></svg></span>
+              <div class="m-t"><b>Two Pointers</b><p>Opposite ends, fast/slow, partitioning</p></div>
+              <span class="count">2 / 3 lessons</span>
+            </div>
+            <div class="lessons">
+              <div class="lesson">
+                <span class="l-state st-done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                <div class="l-t">Intro to Two Pointers<small>4 / 4 questions solved</small></div>
+                <span class="badge b-easy">+40</span>
+              </div>
+              <div class="lesson">
+                <span class="l-state st-cur"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+                <div class="l-t">Pair Sum Patterns<small>2 / 3 questions — finish to unlock next</small></div>
+                <span class="badge b-med">in progress</span>
+              </div>
+              <div class="qlist">
+                <div class="q-row solved"><span class="dot" style="background:var(--success-soft);color:var(--success)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="q-n"><b>Two Sum (sorted)</b></span><span class="badge b-vezy">5</span></div>
+                <div class="q-row solved"><span class="dot" style="background:var(--success-soft);color:var(--success)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="q-n"><b>Valid Palindrome</b></span><span class="badge b-easy">10</span></div>
+                <div class="q-row"><span class="dot" style="background:var(--primary-soft);color:var(--primary)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="q-n"><b>Container With Most Water</b> · not yet attempted</span><span class="badge b-med">20</span></div>
+              </div>
+              <div class="lesson locked">
+                <span class="l-state st-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+                <div class="l-t">Three Pointers &amp; Beyond<small>Locked — clear the step above first</small></div>
+              </div>
+            </div>
+          </div>
+          <div class="card module locked">
+            <div class="m-head">
+              <span class="m-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+              <div class="m-t"><b>Sliding Window</b><p>Fixed &amp; variable windows, longest/shortest</p></div>
+              <span class="count">Locked</span>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LEARNER · SOLVE ===================== -->
+  <section class="screen" id="s-solve" role="tabpanel">
+    <div class="app">
+      <div class="appbar">
+        <div class="brand"><span class="glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span><div class="wordmark">kode<b>map</b></div></div>
+        <span class="crumb" style="margin:0 0 0 6px">Two Pointers / Pair Sum</span>
+        <div class="spacer"></div>
+        <span class="stat flame"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 3-1 4-1 6a3 3 0 0 0 5 2c1 2 2 3 2 6a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 2 2 3 2 0-3-2-4-3-7z"/></svg>12</span>
+        <span class="avatar">AL</span>
+      </div>
+      <div class="main" style="padding:16px">
+        <div class="solve">
+          <div class="panel prob">
+            <div class="prob-title">Container With Most Water</div>
+            <div class="prob-tags">
+              <span class="badge b-med">Medium · 20</span>
+              <span class="tag">Two Pointers</span>
+              <span class="tag">time 1000ms</span>
+              <span class="tag">mem 128mb</span>
+            </div>
+            <p>Given <span class="mono" style="color:var(--tan)">n</span> non-negative heights, pick two lines that with the x-axis form a container holding the most water. Return that maximum area.</p>
+            <h4>Input</h4>
+            <p>First line: integer <span class="mono">n</span>. Second line: <span class="mono">n</span> space-separated heights.</p>
+            <h4>Output</h4>
+            <p>A single integer — the maximum area.</p>
+            <h4>Constraints</h4>
+            <div class="io">2 ≤ n ≤ 1e5
+0 ≤ height[i] ≤ 1e4</div>
+            <h4>Sample cases</h4>
+            <div class="cases">
+              <div><div class="case-l">input</div><div class="io">9
+1 8 6 2 5 4 8 3 7</div></div>
+              <div><div class="case-l">expected</div><div class="io">49</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="editor-wrap">
+              <div class="editor-bar">
+                <span class="lang">C++ 17 <span class="chev">▾</span></span>
+                <span class="tag">auto-saved</span>
+              </div>
+              <div class="editor">
+                <div class="gutter">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10</div>
+<pre class="code"><span class="c">// two pointers from both ends</span>
+<span class="k">int</span> <span class="fn">maxArea</span>(vector&lt;<span class="k">int</span>&gt;&amp; h) {
+    <span class="k">int</span> l = <span class="n">0</span>, r = h.size() - <span class="n">1</span>, best = <span class="n">0</span>;
+    <span class="k">while</span> (l &lt; r) {
+        <span class="k">int</span> area = min(h[l], h[r]) * (r - l);
+        best = max(best, area);
+        h[l] &lt; h[r] ? ++l : --r;
+    }
+    <span class="k">return</span> best;
+}</pre>
+              </div>
+              <div class="editor-foot">
+                <span class="tag">Ln 6, Col 9</span>
+                <span class="spacer"></span>
+                <button class="btn btn-ghost" id="runBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 4 20 12 6 20 6 4"/></svg>Run</button>
+                <button class="btn btn-primary" id="submitBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Submit</button>
+              </div>
+            </div>
+            <div class="result" id="resultBox">
+              <div class="r-head">
+                <span class="pill p-ok" id="verdictPill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Accepted</span>
+                <span class="verdict" id="verdictText" style="color:var(--success)">10 / 10 passed</span>
+              </div>
+              <div class="r-body">
+                <div class="dots" id="dots">
+                  <span class="tdot pass"></span><span class="tdot pass"></span><span class="tdot pass"></span><span class="tdot pass"></span><span class="tdot pass"></span>
+                  <span class="tdot pass"></span><span class="tdot pass"></span><span class="tdot pass"></span><span class="tdot pass"></span><span class="tdot pass"></span>
+                </div>
+                <span class="r-metric">runtime <b id="rt">12 ms</b></span>
+                <span class="r-metric">memory <b id="mem">3.9 MB</b></span>
+                <span class="r-metric">score <b style="color:var(--primary)">+20</b></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LEARNER · LEADERBOARD ===================== -->
+  <section class="screen" id="s-leaderboard" role="tabpanel">
+    <div class="app">
+      <div class="appbar">
+        <div class="brand"><span class="glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span><div class="wordmark">kode<b>map</b></div></div>
+        <div class="spacer"></div>
+        <span class="stat pts">rank #14</span>
+        <span class="avatar">AL</span>
+      </div>
+      <div class="main">
+        <div class="h-row"><h1 class="page-title">Leaderboard</h1></div>
+        <p class="lede">Points come from first-accepted solutions; ties break on who reached the score first. Keep a daily streak going to stay warm.</p>
+        <div class="lb-tabs">
+          <button class="lb-tab on" type="button">Global</button>
+          <button class="lb-tab" type="button">My Batch</button>
+          <button class="lb-tab" type="button">This Week</button>
+        </div>
+        <div class="card" style="overflow-x:auto">
+          <table class="lb-table">
+            <thead><tr><th class="r">#</th><th>Learner</th><th class="r">Score</th><th class="r">Solved</th><th class="r">Streak</th></tr></thead>
+            <tbody>
+              <tr><td class="r"><span class="rank top">1</span></td><td><div class="who"><span class="avatar">RS</span><div><b>rida.s</b><small>NUST · Undergraduate</small></div></div></td><td class="r num">1,860</td><td class="r num">148</td><td class="r"><span class="flamecell"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 3-1 4-1 6a3 3 0 0 0 5 2c1 2 2 3 2 6a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 2 2 3 2 0-3-2-4-3-7z"/></svg>63</span></td></tr>
+              <tr><td class="r"><span class="rank top">2</span></td><td><div class="who"><span class="avatar">HM</span><div><b>hamza_m</b><small>FAST · Graduate</small></div></div></td><td class="r num">1,720</td><td class="r num">139</td><td class="r"><span class="flamecell"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 3-1 4-1 6a3 3 0 0 0 5 2c1 2 2 3 2 6a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 2 2 3 2 0-3-2-4-3-7z"/></svg>41</span></td></tr>
+              <tr><td class="r"><span class="rank top">3</span></td><td><div class="who"><span class="avatar">AK</span><div><b>ayesha.k</b><small>LUMS · Undergraduate</small></div></div></td><td class="r num">1,655</td><td class="r num">131</td><td class="r"><span class="flamecell"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 3-1 4-1 6a3 3 0 0 0 5 2c1 2 2 3 2 6a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 2 2 3 2 0-3-2-4-3-7z"/></svg>28</span></td></tr>
+              <tr><td class="r"><span class="rank">13</span></td><td><div class="who"><span class="avatar">TF</span><div><b>talha.f</b><small>UET · College</small></div></div></td><td class="r num">372</td><td class="r num">29</td><td class="r"><span class="flamecell"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 3-1 4-1 6a3 3 0 0 0 5 2c1 2 2 3 2 6a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 2 2 3 2 0-3-2-4-3-7z"/></svg>9</span></td></tr>
+              <tr class="me"><td class="r"><span class="rank" style="color:var(--primary)">14</span></td><td><div class="who"><span class="avatar">AL</span><div><b>alice · you</b><small>State University · Undergraduate</small></div></div></td><td class="r num">340</td><td class="r num">27</td><td class="r"><span class="flamecell"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 3-1 4-1 6a3 3 0 0 0 5 2c1 2 2 3 2 6a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 2 2 3 2 0-3-2-4-3-7z"/></svg>12</span></td></tr>
+              <tr><td class="r"><span class="rank">15</span></td><td><div class="who"><span class="avatar">BK</span><div><b>bilal.k</b><small>COMSATS · College</small></div></div></td><td class="r num">318</td><td class="r num">25</td><td class="r"><span class="flamecell"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 3-1 4-1 6a3 3 0 0 0 5 2c1 2 2 3 2 6a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 2 2 3 2 0-3-2-4-3-7z"/></svg>4</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ADMIN CONSOLE ===================== -->
+  <section class="screen" id="s-admin" role="tabpanel">
+    <div class="app">
+      <div class="appbar">
+        <div class="brand"><span class="glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span><div class="wordmark">kode<b>map</b></div><span class="chip-tag">admin</span></div>
+        <div class="searchbar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>Search questions, users, submissions…</div>
+        <div class="spacer"></div>
+        <span class="chip-role">Administrator</span>
+        <span class="avatar">SA</span>
+      </div>
+      <div class="body">
+        <aside class="side admin-side">
+          <span class="cap">Overview</span>
+          <span class="nav active" data-page="dash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</span>
+          <span class="cap">Content</span>
+          <span class="nav" data-page="questions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg>Questions</span>
+          <span class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>Test cases</span>
+          <span class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><circle cx="18" cy="5" r="3"/><path d="M6 16V9a4 4 0 0 1 4-4h4M18 8v3a4 4 0 0 1-4 4h-1"/></svg>Tracks &amp; roadmap</span>
+          <span class="cap">People</span>
+          <span class="nav" data-page="users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0M17 5a3 3 0 0 1 0 6M21 20a5 5 0 0 0-4-5"/></svg>Users</span>
+          <span class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Batches</span>
+          <span class="cap">Activity</span>
+          <span class="nav" data-page="subs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Submissions</span>
+          <span class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8"/></svg>Reports</span>
+        </aside>
+        <main class="main dense">
+
+          <!-- DASHBOARD -->
+          <div class="admin-page is-on" id="ap-dash">
+            <div class="crumb">admin / overview</div>
+            <div class="h-row" style="margin-bottom:16px"><h2 style="font-size:20px">Platform overview</h2><span class="filter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Last 14 days</span></div>
+            <div class="kpis">
+              <div class="kpi"><div class="k-l">Active learners</div><div class="k-v">1,284</div><div class="k-d k-up">▲ 6.2% vs prev</div>
+                <svg class="spark" viewBox="0 0 80 26" preserveAspectRatio="none" fill="none"><polyline points="0,20 13,18 26,19 39,14 52,12 65,9 78,6" stroke="var(--tan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="78" cy="6" r="2.4" fill="var(--primary)"/></svg>
+              </div>
+              <div class="kpi"><div class="k-l">Submissions today</div><div class="k-v">3,417</div><div class="k-d k-up">▲ 12% vs avg</div>
+                <svg class="spark" viewBox="0 0 80 26" preserveAspectRatio="none" fill="none"><polyline points="0,18 13,20 26,15 39,16 52,10 65,8 78,5" stroke="var(--tan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="78" cy="5" r="2.4" fill="var(--primary)"/></svg>
+              </div>
+              <div class="kpi"><div class="k-l">Acceptance rate</div><div class="k-v">61.4%</div><div class="k-d k-dn">▼ 1.8% vs prev</div>
+                <svg class="spark" viewBox="0 0 80 26" preserveAspectRatio="none" fill="none"><polyline points="0,8 13,7 26,10 39,9 52,12 65,11 78,14" stroke="var(--tan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="78" cy="14" r="2.4" fill="var(--primary)"/></svg>
+              </div>
+              <div class="kpi"><div class="k-l">Live questions</div><div class="k-v">214</div><div class="k-d k-up">▲ 8 this week</div>
+                <svg class="spark" viewBox="0 0 80 26" preserveAspectRatio="none" fill="none"><polyline points="0,19 13,17 26,17 39,15 52,14 65,12 78,11" stroke="var(--tan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="78" cy="11" r="2.4" fill="var(--primary)"/></svg>
+              </div>
+            </div>
+            <div class="dash-2">
+              <div class="panelcard">
+                <div class="pc-h"><h3>Submissions per day</h3><span>14 days · 28.6k total</span></div>
+                <div class="barchart">
+                  <div class="bar" style="height:42%" title="Jun 24 · 1,910"></div>
+                  <div class="bar" style="height:55%" title="Jun 25 · 2,480"></div>
+                  <div class="bar" style="height:48%" title="Jun 26 · 2,170"></div>
+                  <div class="bar" style="height:63%" title="Jun 27 · 2,840"></div>
+                  <div class="bar" style="height:58%" title="Jun 28 · 2,610"></div>
+                  <div class="bar" style="height:39%" title="Jun 29 · 1,760"></div>
+                  <div class="bar" style="height:44%" title="Jun 30 · 1,980"></div>
+                  <div class="bar" style="height:66%" title="Jul 1 · 2,970"></div>
+                  <div class="bar" style="height:74%" title="Jul 2 · 3,330"></div>
+                  <div class="bar" style="height:60%" title="Jul 3 · 2,700"></div>
+                  <div class="bar" style="height:52%" title="Jul 4 · 2,340"></div>
+                  <div class="bar" style="height:70%" title="Jul 5 · 3,150"></div>
+                  <div class="bar" style="height:82%" title="Jul 6 · 3,690"></div>
+                  <div class="bar today" style="height:95%" title="Jul 7 (today) · 3,417 so far"></div>
+                </div>
+                <div class="barx"><span>Jun 24</span><span>Jul 1</span><span>Today</span></div>
+              </div>
+              <div class="panelcard">
+                <div class="pc-h"><h3>Verdicts today</h3><span>3,417</span></div>
+                <div class="dist">
+                  <span style="width:61%;background:var(--success)" title="Accepted 61%"></span>
+                  <span style="width:22%;background:var(--danger)" title="Wrong Answer 22%"></span>
+                  <span style="width:9%;background:var(--warn)" title="Time Limit 9%"></span>
+                  <span style="width:5%;background:var(--d-chal)" title="Runtime 5%"></span>
+                  <span style="width:3%;background:var(--muted)" title="Compile 3%"></span>
+                </div>
+                <div class="legend">
+                  <div class="lg"><span class="sw2" style="background:var(--success)"></span>Accepted <b>2,084</b></div>
+                  <div class="lg"><span class="sw2" style="background:var(--danger)"></span>Wrong Answer <b>751</b></div>
+                  <div class="lg"><span class="sw2" style="background:var(--warn)"></span>Time Limit <b>307</b></div>
+                  <div class="lg"><span class="sw2" style="background:var(--d-chal)"></span>Runtime Error <b>171</b></div>
+                  <div class="lg"><span class="sw2" style="background:var(--muted)"></span>Compile Error <b>104</b></div>
+                </div>
+              </div>
+            </div>
+            <div class="panelcard">
+              <div class="pc-h"><h3>Recent submissions</h3><span>live feed</span></div>
+              <table class="dtable">
+                <tbody>
+                  <tr><td><div class="who2"><span class="avatar">RS</span><b>rida.s</b></div></td><td>Container With Most Water</td><td class="mono" style="color:var(--muted)">C++</td><td><span class="pill p-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Accepted</span></td><td class="r" style="color:var(--muted)">just now</td></tr>
+                  <tr><td><div class="who2"><span class="avatar">BK</span><b>bilal.k</b></div></td><td>Valid Palindrome</td><td class="mono" style="color:var(--muted)">Python</td><td><span class="pill p-bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Wrong Answer</span></td><td class="r" style="color:var(--muted)">12s ago</td></tr>
+                  <tr><td><div class="who2"><span class="avatar">HM</span><b>hamza_m</b></div></td><td>Longest Substring</td><td class="mono" style="color:var(--muted)">Java</td><td><span class="pill p-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Time Limit</span></td><td class="r" style="color:var(--muted)">40s ago</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- QUESTIONS -->
+          <div class="admin-page" id="ap-questions">
+            <div id="q-list">
+              <div class="crumb">admin / content / questions</div>
+              <div class="h-row" style="margin-bottom:14px"><h2 style="font-size:20px">Question bank</h2>
+                <button class="btn btn-primary sm" data-open-editor type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>New question</button>
+              </div>
+              <div class="toolbar">
+                <span class="search-in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>Search by title or slug…</span>
+                <span class="filter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>Difficulty</span>
+                <span class="filter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>Topic</span>
+                <span class="filter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>Status</span>
+              </div>
+              <div class="card" style="overflow-x:auto">
+                <table class="dtable">
+                  <thead><tr><th>Title</th><th>Difficulty</th><th>Topic</th><th>Step</th><th class="r">Tests</th><th class="r">Subs</th><th class="r">Acc%</th><th>Status</th><th></th></tr></thead>
+                  <tbody>
+                    <tr><td><b>Sum of First N Numbers</b></td><td><span class="badge b-vezy">Very Easy</span></td><td>Loops</td><td class="mono" style="color:var(--muted)">Basics › Loops</td><td class="r">8</td><td class="r">4,120</td><td class="r">92</td><td><span class="status-dot" style="color:var(--success)"><i></i>Live</span></td><td><button class="iconbtn" type="button" aria-label="Edit" data-open-editor><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></td></tr>
+                    <tr><td><b>Valid Palindrome</b></td><td><span class="badge b-easy">Easy</span></td><td>Two Pointers</td><td class="mono" style="color:var(--muted)">DSA › Two Pointers</td><td class="r">12</td><td class="r">2,880</td><td class="r">74</td><td><span class="status-dot" style="color:var(--success)"><i></i>Live</span></td><td><button class="iconbtn" type="button" aria-label="Edit" data-open-editor><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></td></tr>
+                    <tr><td><b>Container With Most Water</b></td><td><span class="badge b-med">Medium</span></td><td>Two Pointers</td><td class="mono" style="color:var(--muted)">DSA › Pair Sum</td><td class="r">12</td><td class="r">1,540</td><td class="r">58</td><td><span class="status-dot" style="color:var(--success)"><i></i>Live</span></td><td><button class="iconbtn" type="button" aria-label="Edit" data-open-editor><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></td></tr>
+                    <tr><td><b>Coin Change</b></td><td><span class="badge b-hard">Hard</span></td><td>Dynamic Prog</td><td class="mono" style="color:var(--muted)">CP › DP</td><td class="r">20</td><td class="r">610</td><td class="r">33</td><td><span class="status-dot" style="color:var(--warn)"><i></i>Draft</span></td><td><button class="iconbtn" type="button" aria-label="Edit" data-open-editor><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></td></tr>
+                    <tr><td><b>Max XOR Pair</b></td><td><span class="badge b-chal">Challenge</span></td><td>Bit Manip</td><td class="mono" style="color:var(--muted)">CP › Bits</td><td class="r">24</td><td class="r">204</td><td class="r">19</td><td><span class="status-dot" style="color:var(--muted)"><i></i>Hidden</span></td><td><button class="iconbtn" type="button" aria-label="Edit" data-open-editor><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- editor (opens over the list) -->
+            <div id="q-editor" hidden>
+              <div class="editor-head">
+                <button class="iconbtn" data-close-editor type="button" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+                <div class="crumb" style="margin:0">admin / content / questions / edit</div>
+                <div class="spacer" style="flex:1"></div>
+                <button class="btn btn-quiet sm" data-close-editor type="button">Cancel</button>
+                <button class="btn btn-primary sm" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>Publish question</button>
+              </div>
+              <div class="admin-grid">
+                <div class="card" style="padding:18px 20px">
+                  <div class="field"><label>Title</label><input class="in" value="Container With Most Water" /></div>
+                  <div class="field"><label>Slug</label><input class="in mono" value="container-with-most-water" /></div>
+                  <div class="row2">
+                    <div class="field"><label>Difficulty</label><div class="select"><select class="in"><option>Medium · 20 pts</option><option>Very Easy · 5</option><option>Hard · 40</option></select><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div></div>
+                    <div class="field"><label>Topic</label><div class="select"><select class="in"><option>Two Pointers</option><option>Arrays</option><option>Hashing</option></select><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div></div>
+                  </div>
+                  <div class="field"><label>Roadmap step</label><div class="select"><select class="in"><option>DSA Foundation › Two Pointers › Pair Sum Patterns</option></select><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div></div>
+                  <div class="field"><label>Statement</label><textarea class="in">Given n non-negative heights, pick two lines that with the x-axis form a container holding the most water. Return the maximum area.</textarea></div>
+                  <div class="row2">
+                    <div class="field"><label>Time limit (ms)</label><input class="in mono" value="1000" /></div>
+                    <div class="field"><label>Memory (mb)</label><input class="in mono" value="128" /></div>
+                  </div>
+                </div>
+                <div class="card" style="padding:18px 20px">
+                  <h3 style="font-size:15px;margin-bottom:4px">Test cases <span class="mono" style="color:var(--muted);font-weight:400;font-size:12px">· <span id="tc-count">4</span> added · no limit</span></h3>
+                  <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">Add as many as you need — bulk via CSV, or one at a time below. Columns: <span class="mono" style="color:var(--tan)">input, expected_output, is_sample, points</span>. Sample cases show to learners; the rest stay hidden for judging.</p>
+                  <div class="dropzone">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M12 3v13M7 8l5-5 5 5"/></svg>
+                    <b>Drop <span class="mono">testcases.csv</span> here</b>
+                    <span>or click to browse — import unlimited rows</span>
+                  </div>
+                  <table class="tc-table">
+                    <thead><tr><th>#</th><th>input</th><th>expected</th><th>type</th><th></th></tr></thead>
+                    <tbody id="tc-body">
+                      <tr><td>1</td><td>9 / 1 8 6 2 5…</td><td>49</td><td class="s-flag">sample</td><td></td></tr>
+                      <tr><td>2</td><td>2 / 1 1</td><td>1</td><td class="s-flag">sample</td><td></td></tr>
+                      <tr><td>3</td><td>5 / 4 3 2 1 4</td><td>16</td><td class="h-flag">hidden</td><td></td></tr>
+                      <tr><td>4</td><td>6 / 1 2 4 3 5 2</td><td>12</td><td class="h-flag">hidden</td><td></td></tr>
+                    </tbody>
+                  </table>
+                  <div class="tc-add">
+                    <input class="in mono" id="tc-in" placeholder="input" />
+                    <input class="in mono" id="tc-exp" placeholder="expected" />
+                    <div class="select"><select class="in" id="tc-type"><option value="hidden">hidden</option><option value="sample">sample</option></select><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+                    <button class="btn btn-ghost sm" id="addTcBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Add</button>
+                  </div>
+                  <div style="display:flex;gap:9px;margin-top:14px">
+                    <button class="btn btn-primary" type="button" style="flex:1;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M7 8l5-5 5 5M21 21H3"/></svg>Import CSV</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- USERS -->
+          <div class="admin-page" id="ap-users">
+            <div class="crumb">admin / people / users</div>
+            <div class="h-row" style="margin-bottom:14px"><h2 style="font-size:20px">Users</h2>
+              <button class="btn btn-primary sm" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Add user</button>
+            </div>
+            <div class="toolbar">
+              <span class="search-in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>Search name or email…</span>
+              <span class="filter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>Role</span>
+              <span class="filter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>Batch</span>
+              <span class="filter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>Status</span>
+            </div>
+            <div class="card" style="overflow-x:auto">
+              <table class="dtable">
+                <thead><tr><th>User</th><th>Role</th><th>Batch</th><th class="r">Solved</th><th class="r">Score</th><th class="r">Streak</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                  <tr><td><div class="who2"><span class="avatar">AL</span><div><b>alice</b><small>alice@example.com</small></div></div></td><td><span class="rolechip role-l">learner</span></td><td class="mono" style="color:var(--muted)">Fall-A</td><td class="r">27</td><td class="r">340</td><td class="r">12</td><td><span class="status-dot" style="color:var(--success)"><i></i>Active</span></td><td><button class="iconbtn" type="button" aria-label="Manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg></button></td></tr>
+                  <tr><td><div class="who2"><span class="avatar">RS</span><div><b>rida.s</b><small>rida@nust.edu.pk</small></div></div></td><td><span class="rolechip role-l">learner</span></td><td class="mono" style="color:var(--muted)">Fall-A</td><td class="r">148</td><td class="r">1,860</td><td class="r">63</td><td><span class="status-dot" style="color:var(--success)"><i></i>Active</span></td><td><button class="iconbtn" type="button" aria-label="Manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg></button></td></tr>
+                  <tr><td><div class="who2"><span class="avatar">DR</span><div><b>dr.imran</b><small>imran@kodemap.io</small></div></div></td><td><span class="rolechip role-s">supervisor</span></td><td class="mono" style="color:var(--muted)">Fall-A · Fall-B</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td><span class="status-dot" style="color:var(--success)"><i></i>Active</span></td><td><button class="iconbtn" type="button" aria-label="Manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg></button></td></tr>
+                  <tr><td><div class="who2"><span class="avatar">SA</span><div><b>admin</b><small>admin@kodemap.io</small></div></div></td><td><span class="rolechip role-a">admin</span></td><td class="mono" style="color:var(--muted)">—</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td><span class="status-dot" style="color:var(--success)"><i></i>Active</span></td><td><button class="iconbtn" type="button" aria-label="Manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg></button></td></tr>
+                  <tr><td><div class="who2"><span class="avatar">BK</span><div><b>bilal.k</b><small>bilal@comsats.edu</small></div></div></td><td><span class="rolechip role-l">learner</span></td><td class="mono" style="color:var(--muted)">Fall-B</td><td class="r">25</td><td class="r">318</td><td class="r">4</td><td><span class="status-dot" style="color:var(--muted)"><i></i>Disabled</span></td><td><button class="iconbtn" type="button" aria-label="Manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg></button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- SUBMISSIONS -->
+          <div class="admin-page" id="ap-subs">
+            <div class="crumb">admin / activity / submissions</div>
+            <div class="h-row" style="margin-bottom:14px"><h2 style="font-size:20px">Submissions monitor</h2><span class="status-dot" style="color:var(--success)"><i></i>live</span></div>
+            <div class="toolbar">
+              <span class="search-in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>Search user or question…</span>
+              <span class="filter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>Verdict</span>
+              <span class="filter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>Language</span>
+            </div>
+            <div class="card" style="overflow-x:auto">
+              <table class="dtable">
+                <thead><tr><th>Time</th><th>User</th><th>Question</th><th>Lang</th><th>Verdict</th><th class="r">Time</th><th class="r">Mem</th><th>Judge0 token</th></tr></thead>
+                <tbody>
+                  <tr><td class="mono" style="color:var(--muted)">10:42:07</td><td><div class="who2"><span class="avatar">RS</span><b>rida.s</b></div></td><td>Container With Most Water</td><td class="mono" style="color:var(--muted)">C++</td><td><span class="pill p-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Accepted</span></td><td class="r">12ms</td><td class="r">3.9MB</td><td class="mono" style="color:var(--muted)">a91f…c20</td></tr>
+                  <tr><td class="mono" style="color:var(--muted)">10:41:55</td><td><div class="who2"><span class="avatar">BK</span><b>bilal.k</b></div></td><td>Valid Palindrome</td><td class="mono" style="color:var(--muted)">Python</td><td><span class="pill p-bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Wrong Answer</span></td><td class="r">41ms</td><td class="r">11MB</td><td class="mono" style="color:var(--muted)">7be2…9d1</td></tr>
+                  <tr><td class="mono" style="color:var(--muted)">10:41:30</td><td><div class="who2"><span class="avatar">HM</span><b>hamza_m</b></div></td><td>Longest Substring</td><td class="mono" style="color:var(--muted)">Java</td><td><span class="pill p-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Time Limit</span></td><td class="r">1000ms</td><td class="r">22MB</td><td class="mono" style="color:var(--muted)">c40a…1f8</td></tr>
+                  <tr><td class="mono" style="color:var(--muted)">10:40:58</td><td><div class="who2"><span class="avatar">AK</span><b>ayesha.k</b></div></td><td>Coin Change</td><td class="mono" style="color:var(--muted)">C++</td><td><span class="pill p-bad" style="color:var(--d-chal);background:color-mix(in srgb,var(--d-chal) 14%,transparent)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>Runtime</span></td><td class="r">8ms</td><td class="r">4MB</td><td class="mono" style="color:var(--muted)">e10d…7a3</td></tr>
+                  <tr><td class="mono" style="color:var(--muted)">10:40:12</td><td><div class="who2"><span class="avatar">AL</span><b>alice</b></div></td><td>Two Sum (sorted)</td><td class="mono" style="color:var(--muted)">Python</td><td><span class="pill p-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Accepted</span></td><td class="r">19ms</td><td class="r">10MB</td><td class="mono" style="color:var(--muted)">44bc…0e5</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <div class="note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+    <div><b>One login, two worlds.</b> Use the top switch to move between the <b>Learner app</b> (warm top-tab shell) and the <b>Admin console</b> (its own sidebar-driven back office — Dashboard, Questions, Users, Submissions). Inside Admin, the left sidebar navigates; on <b>Questions</b>, "New question" opens the editor with CSV testcase import. Theme toggle top-right tunes both light and dark. Placeholder logo throughout — swap for your files.</div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var media = window.matchMedia("(prefers-color-scheme: dark)");
+    function current() { return root.getAttribute("data-theme") || (media.matches ? "dark" : "light"); }
+    function paint() {
+      var dark = current() === "dark";
+      document.getElementById("themeLabel").textContent = dark ? "Dark" : "Light";
+      document.getElementById("themeIcon").innerHTML = dark
+        ? '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>'
+        : '<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/>';
+    }
+    document.getElementById("themeBtn").addEventListener("click", function () {
+      root.setAttribute("data-theme", current() === "dark" ? "light" : "dark");
+      paint();
+    });
+    media.addEventListener("change", paint);
+    paint();
+
+    // ---- environment + screen navigation ----
+    function show(id) {
+      document.querySelectorAll(".screen").forEach(function (s) { s.classList.toggle("is-active", s.id === id); });
+    }
+    var envBtns = document.querySelectorAll(".env");
+    var subLearner = document.getElementById("sub-learner");
+    var learnerLast = "s-roadmap";
+    function setEnv(env) {
+      envBtns.forEach(function (b) { b.classList.toggle("is-on", b.dataset.env === env); });
+      subLearner.hidden = env !== "learner";
+      if (env === "style") show("s-style");
+      else if (env === "admin") show("s-admin");
+      else show(learnerLast);
+    }
+    envBtns.forEach(function (b) { b.addEventListener("click", function () { setEnv(b.dataset.env); }); });
+
+    var subBtns = subLearner.querySelectorAll(".seg");
+    subBtns.forEach(function (t) {
+      t.addEventListener("click", function () {
+        subBtns.forEach(function (x) { x.setAttribute("aria-selected", "false"); });
+        t.setAttribute("aria-selected", "true");
+        learnerLast = "s-" + t.dataset.screen;
+        show(learnerLast);
+      });
+    });
+
+    // admin sidebar page navigation
+    var pageNavs = document.querySelectorAll("#s-admin .nav[data-page]");
+    pageNavs.forEach(function (n) {
+      n.addEventListener("click", function () {
+        pageNavs.forEach(function (x) { x.classList.remove("active"); });
+        n.classList.add("active");
+        document.querySelectorAll("#s-admin .admin-page").forEach(function (p) {
+          p.classList.toggle("is-on", p.id === "ap-" + n.dataset.page);
+        });
+      });
+    });
+
+    // question editor open/close
+    document.querySelectorAll("[data-open-editor]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        document.getElementById("q-list").hidden = true;
+        document.getElementById("q-editor").hidden = false;
+      });
+    });
+    document.querySelectorAll("[data-close-editor]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        document.getElementById("q-editor").hidden = true;
+        document.getElementById("q-list").hidden = false;
+      });
+    });
+
+    setEnv("learner");
+
+    // manual test cases — append as many as you want (no cap)
+    var addTcBtn = document.getElementById("addTcBtn");
+    if (addTcBtn) {
+      addTcBtn.addEventListener("click", function () {
+        var body = document.getElementById("tc-body");
+        var inp = document.getElementById("tc-in");
+        var exp = document.getElementById("tc-exp");
+        var type = document.getElementById("tc-type").value;
+        var n = body.children.length + 1;
+        function cell(text, cls) { var e = document.createElement("td"); e.textContent = text; if (cls) e.className = cls; return e; }
+        var tr = document.createElement("tr");
+        tr.appendChild(cell(n));
+        tr.appendChild(cell(inp.value || "—"));
+        tr.appendChild(cell(exp.value || "—"));
+        tr.appendChild(cell(type, type === "sample" ? "s-flag" : "h-flag"));
+        tr.appendChild(cell(""));
+        body.appendChild(tr);
+        document.getElementById("tc-count").textContent = n;
+        inp.value = ""; exp.value = ""; inp.focus();
+      });
+    }
+
+    // solve: fake judging
+    var dots = document.getElementById("dots").children;
+    function judge(mode) {
+      var pill = document.getElementById("verdictPill");
+      var vtext = document.getElementById("verdictText");
+      var n = dots.length, i = 0;
+      for (var d = 0; d < n; d++) dots[d].className = "tdot wait";
+      pill.className = "pill p-run";
+      pill.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/></svg>Judging…';
+      vtext.style.color = "var(--tan)"; vtext.textContent = "running " + (mode === "run" ? "samples" : "hidden tests") + "…";
+      var total = mode === "run" ? 2 : n;
+      var timer = setInterval(function () {
+        if (i >= total) {
+          clearInterval(timer);
+          pill.className = "pill p-ok";
+          pill.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Accepted';
+          vtext.style.color = "var(--success)";
+          vtext.textContent = total + " / " + total + (mode === "run" ? " samples passed" : " passed");
+          for (var d2 = total; d2 < n; d2++) dots[d2].className = "tdot";
+          return;
+        }
+        dots[i].className = "tdot pass"; i++;
+      }, 160);
+    }
+    document.getElementById("runBtn").addEventListener("click", function () { judge("run"); });
+    document.getElementById("submitBtn").addEventListener("click", function () { judge("submit"); });
+  })();
+</script>
+</body>
+</html>

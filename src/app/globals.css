@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Kodemap — "Ember" design tokens
+   Dark-first. Light is applied when the OS prefers it, and the
+   theme toggle (data-theme on <html>) overrides both.
+   ============================================================ */
+:root {
+  --ground:      #0C0A08;
+  --raise:       #13100C;
+  --surface:     #17130E;
+  --elevated:    #201A13;
+  --line:        #2B231B;
+  --line-2:      #3A2F24;
+  --ink:         #F4ECE2;
+  --ink-dim:     #B7A896;
+  --ink-mute:    #8A7C6A;
+
+  --ember:       #F65F2E;
+  --ember-hover: #FF7548;
+  --ember-press: #DE4E22;
+  --on-ember:    #1B0E06;
+  --ember-soft:  rgba(246, 95, 46, 0.14);
+  --ember-line:  rgba(246, 95, 46, 0.38);
+
+  --tan:         #CBA47D;
+  --tan-soft:    rgba(203, 164, 125, 0.14);
+
+  --ok:    #4CB98A; --ok-soft:   rgba(76, 185, 138, 0.14);
+  --warn:  #E2A63E; --warn-soft: rgba(226, 166, 62, 0.14);
+  --bad:   #E9564C; --bad-soft:  rgba(233, 86, 76, 0.14);
+
+  --d-vezy: #4CB98A;
+  --d-easy: #86BB4B;
+  --d-med:  #E2A63E;
+  --d-hard: #F65F2E;
+  --d-chal: #D6455B;
+
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.02) inset, 0 8px 24px -12px rgba(0, 0, 0, 0.7);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+    --ground:      #F1EADF;
+    --raise:       #EBE2D4;
+    --surface:     #FFFFFF;
+    --elevated:    #F8F3EB;
+    --line:        #E7DBCA;
+    --line-2:      #D8C8B2;
+    --ink:         #241C13;
+    --ink-dim:     #5C5142;
+    --ink-mute:    #867868;
+    --ember:       #E24E1B;
+    --ember-hover: #C8410F;
+    --ember-press: #B23A0D;
+    --on-ember:    #FFFFFF;
+    --ember-soft:  rgba(226, 78, 27, 0.10);
+    --ember-line:  rgba(226, 78, 27, 0.30);
+    --tan:         #A9825B;
+    --tan-soft:    rgba(169, 130, 91, 0.14);
+    --ok:   #2E9E6E; --ok-soft:   rgba(46, 158, 110, 0.12);
+    --warn: #B9821B; --warn-soft: rgba(185, 130, 27, 0.14);
+    --bad:  #CF3E33; --bad-soft:  rgba(207, 62, 51, 0.12);
+    --d-vezy: #2E9E6E; --d-easy: #5E9A2A; --d-med: #B9821B; --d-hard: #E24E1B; --d-chal: #C13350;
+    --shadow: 0 1px 2px rgba(60, 40, 20, 0.04), 0 10px 26px -16px rgba(80, 50, 20, 0.28);
+  }
+}
+
+:root[data-theme="dark"] { color-scheme: dark; }
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --ground:      #F1EADF;
+  --raise:       #EBE2D4;
+  --surface:     #FFFFFF;
+  --elevated:    #F8F3EB;
+  --line:        #E7DBCA;
+  --line-2:      #D8C8B2;
+  --ink:         #241C13;
+  --ink-dim:     #5C5142;
+  --ink-mute:    #867868;
+  --ember:       #E24E1B;
+  --ember-hover: #C8410F;
+  --ember-press: #B23A0D;
+  --on-ember:    #FFFFFF;
+  --ember-soft:  rgba(226, 78, 27, 0.10);
+  --ember-line:  rgba(226, 78, 27, 0.30);
+  --tan:         #A9825B;
+  --tan-soft:    rgba(169, 130, 91, 0.14);
+  --ok:   #2E9E6E; --ok-soft:   rgba(46, 158, 110, 0.12);
+  --warn: #B9821B; --warn-soft: rgba(185, 130, 27, 0.14);
+  --bad:  #CF3E33; --bad-soft:  rgba(207, 62, 51, 0.12);
+  --d-vezy: #2E9E6E; --d-easy: #5E9A2A; --d-med: #B9821B; --d-hard: #E24E1B; --d-chal: #C13350;
+  --shadow: 0 1px 2px rgba(60, 40, 20, 0.04), 0 10px 26px -16px rgba(80, 50, 20, 0.28);
+}
+
+/* Map tokens to Tailwind utilities: bg-surface, text-ink-dim, border-line, text-ember, … */
+@theme inline {
+  --color-ground:      var(--ground);
+  --color-raise:       var(--raise);
+  --color-surface:     var(--surface);
+  --color-elevated:    var(--elevated);
+  --color-line:        var(--line);
+  --color-line-2:      var(--line-2);
+  --color-ink:         var(--ink);
+  --color-ink-dim:     var(--ink-dim);
+  --color-ink-mute:    var(--ink-mute);
+  --color-ember:       var(--ember);
+  --color-ember-hover: var(--ember-hover);
+  --color-ember-press: var(--ember-press);
+  --color-on-ember:    var(--on-ember);
+  --color-ember-soft:  var(--ember-soft);
+  --color-ember-line:  var(--ember-line);
+  --color-tan:         var(--tan);
+  --color-tan-soft:    var(--tan-soft);
+  --color-ok:          var(--ok);
+  --color-ok-soft:     var(--ok-soft);
+  --color-warn:        var(--warn);
+  --color-warn-soft:   var(--warn-soft);
+  --color-bad:         var(--bad);
+  --color-bad-soft:    var(--bad-soft);
+  --color-d-vezy:      var(--d-vezy);
+  --color-d-easy:      var(--d-easy);
+  --color-d-med:       var(--d-med);
+  --color-d-hard:      var(--d-hard);
+  --color-d-chal:      var(--d-chal);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --radius-card: 14px;
+}
+
+* {
+  border-color: var(--line);
+}
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection { background: var(--ember-soft); }
+
+:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
