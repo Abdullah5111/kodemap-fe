@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -29,10 +29,12 @@ function isUnverified(err: unknown): boolean {
   return flat.includes("email_not_verified") || /not verified/i.test(detail);
 }
 
-export default function LoginPage() {
+function LoginInner() {
   const router = useRouter();
+  const params = useSearchParams();
   const { refresh } = useAuth();
   const [formError, setFormError] = useState<string | null>(null);
+  const resetDone = params.get("reset") === "1";
 
   const {
     register,
@@ -57,9 +59,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="rounded-2xl border border-line bg-surface p-7 shadow-[var(--shadow)]">
+    <div className="mx-auto w-full max-w-[400px] rounded-2xl border border-line bg-surface p-7 shadow-[var(--shadow)]">
       <h1 className="text-[22px] font-bold tracking-tight">Welcome back</h1>
       <p className="mt-1.5 text-sm text-ink-dim">Sign in to pick up your roadmap.</p>
+
+      {resetDone ? (
+        <p className="mt-4 rounded-[9px] border border-ok/40 bg-ok-soft px-3 py-2 text-[13px] text-ok">
+          Password updated. Sign in with your new password.
+        </p>
+      ) : null}
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 flex flex-col gap-4" noValidate>
         <Field label="Email" htmlFor="email" error={errors.email?.message}>
@@ -109,5 +117,13 @@ export default function LoginPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginInner />
+    </Suspense>
   );
 }
