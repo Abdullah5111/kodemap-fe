@@ -10,6 +10,15 @@ export const Input = forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTML
   },
 );
 
+export const Textarea = forwardRef<
+  HTMLTextAreaElement,
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>
+>(function Textarea({ className, ...props }, ref) {
+  return (
+    <textarea ref={ref} className={cn(inputClass, "min-h-[92px] resize-y", className)} {...props} />
+  );
+});
+
 export function Field({
   label,
   htmlFor,
