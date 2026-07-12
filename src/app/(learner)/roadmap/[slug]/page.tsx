@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { contentApi } from "@/lib/content";
 import { apiErrorMessage } from "@/lib/api";
 import { Loading, ErrorState } from "@/components/ui/feedback";
+import { DifficultyBadge } from "@/components/ui/badge";
 
 export default function TrackTreePage() {
   const params = useParams<{ slug: string }>();
@@ -69,20 +70,35 @@ export default function TrackTreePage() {
                 {module.lessons.length > 0 ? (
                   <div className="border-t border-line">
                     {module.lessons.map((lesson) => (
-                      <div
-                        key={lesson.id}
-                        className="flex items-center gap-3 border-b border-line px-5 py-3 last:border-b-0"
-                      >
-                        <span className="size-2 rounded-full bg-line-2" />
-                        <div className="flex-1">
-                          <span className="text-[14px]">{lesson.title}</span>
-                          {lesson.description ? (
-                            <p className="text-[12px] text-ink-mute">{lesson.description}</p>
-                          ) : null}
+                      <div key={lesson.id} className="border-b border-line px-5 py-3 last:border-b-0">
+                        <div className="flex items-center gap-3">
+                          <span className="size-2 rounded-full bg-line-2" />
+                          <div className="flex-1">
+                            <span className="text-[14px]">{lesson.title}</span>
+                            {lesson.description ? (
+                              <p className="text-[12px] text-ink-mute">{lesson.description}</p>
+                            ) : null}
+                          </div>
+                          <span className="font-mono text-[12px] text-ink-mute">
+                            {lesson.question_count}{" "}
+                            {lesson.question_count === 1 ? "question" : "questions"}
+                          </span>
                         </div>
-                        <span className="font-mono text-[12px] text-ink-mute">
-                          {lesson.question_count} {lesson.question_count === 1 ? "question" : "questions"}
-                        </span>
+
+                        {lesson.questions.length > 0 ? (
+                          <div className="mt-2.5 flex flex-col gap-1.5 pl-5">
+                            {lesson.questions.map((question) => (
+                              <Link
+                                key={question.id}
+                                href={`/questions/${question.slug}`}
+                                className="flex items-center gap-2.5 rounded-lg border border-line bg-ground px-3 py-2 text-[13.5px] transition-colors hover:border-line-2 hover:text-ember"
+                              >
+                                <span className="flex-1">{question.title}</span>
+                                <DifficultyBadge difficulty={question.difficulty} />
+                              </Link>
+                            ))}
+                          </div>
+                        ) : null}
                       </div>
                     ))}
                   </div>

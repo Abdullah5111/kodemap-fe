@@ -36,6 +36,15 @@ export interface TrackSummary {
   question_count: number;
 }
 
+export interface RoadmapQuestion {
+  id: number;
+  title: string;
+  slug: string;
+  difficulty: Difficulty;
+  score: number;
+  is_required: boolean;
+}
+
 export interface RoadmapLesson {
   id: number;
   title: string;
@@ -43,6 +52,7 @@ export interface RoadmapLesson {
   sort_order: number;
   question_count: number;
   required_count: number;
+  questions: RoadmapQuestion[];
 }
 
 export interface RoadmapModule {
