@@ -48,3 +48,12 @@ export const IconSearch = ({ className }: P) => (
 export const IconFlame = ({ className }: P) => (
   <svg className={s(className)} fill="currentColor" viewBox="0 0 24 24"><path d="M12 2c1 3-1 4-1 6a3 3 0 0 0 5 2c1 2 2 3 2 6a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 2 2 3 2 0-3-2-4-3-7z" /></svg>
 );
+export const IconLock = ({ className }: P) => (
+  <svg className={s(className)} {...common}><rect x="4.5" y="11" width="15" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+);
+export const IconCheck = ({ className }: P) => (
+  <svg className={s(className)} {...common}><path d="M20 6 9 17l-5-5" /></svg>
+);
+export const IconArrowRight = ({ className }: P) => (
+  <svg className={s(className)} {...common}><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+);

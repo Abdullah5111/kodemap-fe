@@ -23,6 +23,8 @@ export interface QuestionDetail {
   memory_limit_kb: number;
   allowed_languages: Language[];
   sample_testcases: SampleTestcase[];
+  is_solved: boolean;
+  is_unlocked: boolean;
 }
 
 export type SubmissionStatus =

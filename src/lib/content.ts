@@ -36,6 +36,9 @@ export interface TrackSummary {
   question_count: number;
 }
 
+export type QuestionState = "solved" | "current" | "locked" | "optional";
+export type LessonState = "complete" | "current" | "locked" | "open";
+
 export interface RoadmapQuestion {
   id: number;
   title: string;
@@ -43,6 +46,9 @@ export interface RoadmapQuestion {
   difficulty: Difficulty;
   score: number;
   is_required: boolean;
+  state: QuestionState;
+  is_solved: boolean;
+  is_unlocked: boolean;
 }
 
 export interface RoadmapLesson {
@@ -53,6 +59,7 @@ export interface RoadmapLesson {
   question_count: number;
   required_count: number;
   questions: RoadmapQuestion[];
+  state: LessonState;
 }
 
 export interface RoadmapModule {
