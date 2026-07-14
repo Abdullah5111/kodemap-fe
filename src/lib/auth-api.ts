@@ -2,6 +2,17 @@ import { api } from "./api";
 import { tokens } from "./tokens";
 import type { TokenPair, User } from "./types";
 
+export interface ProfileUpdate {
+  full_name?: string;
+  education_level?: string;
+  institution?: string;
+  field_of_study?: string;
+  graduation_year?: number | null;
+  current_year?: string;
+  github_url?: string;
+  bio?: string;
+}
+
 export interface RegisterPayload {
   email: string;
   username: string;
@@ -55,6 +66,19 @@ export const authApi = {
 
   async me(): Promise<User> {
     const { data } = await api.get<User>("/me");
+    return data;
+  },
+
+  async updateProfile(payload: ProfileUpdate): Promise<User> {
+    const { data } = await api.patch<User>("/me", payload);
+    return data;
+  },
+
+  /** Multipart PATCH — axios sets the boundary content-type from the FormData. */
+  async uploadAvatar(file: File): Promise<User> {
+    const fd = new FormData();
+    fd.append("avatar", file);
+    const { data } = await api.patch<User>("/me", fd);
     return data;
   },
 
