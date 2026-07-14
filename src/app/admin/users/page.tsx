@@ -37,8 +37,14 @@ function UsersView() {
   const [search, setSearch] = useState("");
   const [role, setRole] = useState("");
   const [active, setActive] = useState("");
+  const [batch, setBatch] = useState("");
   const [ordering, setOrdering] = useState("-score");
   const [focusId, setFocusId] = useState<number | null>(null);
+
+  const { data: batches } = useQuery({
+    queryKey: ["admin-batches"],
+    queryFn: adminApi.batches,
+  });
 
   // deep-link from the dashboard (?focus=<id>)
   useEffect(() => {
@@ -50,9 +56,10 @@ function UsersView() {
   if (search.trim()) params.search = search.trim();
   if (role) params.role = role;
   if (active) params.is_active = active;
+  if (batch) params.batch = batch;
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["admin-users", ordering, role, active, search.trim()],
+    queryKey: ["admin-users", ordering, role, active, batch, search.trim()],
     queryFn: () => adminApi.users(params),
   });
 
@@ -90,6 +97,13 @@ function UsersView() {
           <option value="true">Active</option>
           <option value="false">Disabled</option>
         </Select>
+        <Select value={batch} onChange={(e) => setBatch(e.target.value)} className="w-auto">
+          <option value="">Any batch</option>
+          <option value="none">No batch</option>
+          {(batches ?? []).map((b) => (
+            <option key={b.id} value={String(b.id)}>{b.name}</option>
+          ))}
+        </Select>
         <Select value={ordering} onChange={(e) => setOrdering(e.target.value)} className="w-auto">
           <option value="-score">Top score</option>
           <option value="-solved">Most solved</option>
@@ -112,6 +126,7 @@ function UsersView() {
                 <tr className="border-b border-line text-left font-mono text-[10px] uppercase tracking-wider text-ink-mute">
                   <th className="px-3 py-2.5 font-semibold">User</th>
                   <th className="px-3 py-2.5 font-semibold">Role</th>
+                  <th className="px-3 py-2.5 font-semibold">Batch</th>
                   <th className="px-3 py-2.5 text-right font-semibold">Score</th>
                   <th className="px-3 py-2.5 text-right font-semibold">Solved</th>
                   <th className="px-3 py-2.5 text-right font-semibold">Streak</th>
@@ -152,6 +167,7 @@ function UserRow({ u, onOpen }: { u: AdminUser; onOpen: () => void }) {
         </div>
       </td>
       <td className="px-3 py-3"><RolePill role={u.role} /></td>
+      <td className="px-3 py-3 font-mono text-[11.5px] text-ink-mute">{u.batch_name ?? "—"}</td>
       <td className="px-3 py-3 text-right font-mono text-[13px] tabular-nums text-ember">{u.score}</td>
       <td className="px-3 py-3 text-right font-mono text-[13px] tabular-nums">{u.solved}</td>
       <td className="px-3 py-3 text-right">
@@ -184,13 +200,20 @@ function UserDrawer({ id, onClose }: { id: number; onClose: () => void }) {
     queryFn: () => adminApi.user(id),
   });
 
+  const { data: batches } = useQuery({
+    queryKey: ["admin-batches"],
+    queryFn: adminApi.batches,
+  });
+
   const mutation = useMutation({
-    mutationFn: (payload: { role?: Role; is_active?: boolean }) => adminApi.updateUser(id, payload),
+    mutationFn: (payload: { role?: Role; is_active?: boolean; batch?: number | null }) =>
+      adminApi.updateUser(id, payload),
     onSuccess: () => {
       setErr(null);
       qc.invalidateQueries({ queryKey: ["admin-users"] });
       qc.invalidateQueries({ queryKey: ["admin-user", id] });
       qc.invalidateQueries({ queryKey: ["admin-overview"] });
+      qc.invalidateQueries({ queryKey: ["admin-batches"] });
     },
     onError: (e) => setErr(apiErrorMessage(e, "Couldn't update this user.")),
   });
@@ -319,6 +342,22 @@ function UserDrawer({ id, onClose }: { id: number; onClose: () => void }) {
                     <option value="learner">Learner</option>
                     <option value="supervisor">Supervisor</option>
                     <option value="admin">Admin</option>
+                  </Select>
+                </label>
+                <label className="flex items-center justify-between gap-3 text-[13px]">
+                  <span className="text-ink-dim">Batch</span>
+                  <Select
+                    value={u.batch ?? ""}
+                    disabled={mutation.isPending}
+                    onChange={(e) =>
+                      mutation.mutate({ batch: e.target.value ? Number(e.target.value) : null })
+                    }
+                    className="w-40"
+                  >
+                    <option value="">No batch</option>
+                    {(batches ?? []).map((b) => (
+                      <option key={b.id} value={b.id}>{b.name}</option>
+                    ))}
                   </Select>
                 </label>
                 <Button

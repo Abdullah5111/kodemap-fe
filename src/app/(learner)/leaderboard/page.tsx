@@ -46,22 +46,25 @@ function Row({ e }: { e: LeaderboardEntry }) {
   );
 }
 
-const TABS = [
+type Scope = "global" | "batch";
+
+const TABS: { key: Scope | "weekly"; label: string; enabled: boolean }[] = [
   { key: "global", label: "Global", enabled: true },
-  { key: "batch", label: "My Batch", enabled: false },
+  { key: "batch", label: "My Batch", enabled: true },
   { key: "weekly", label: "This Week", enabled: false },
 ];
 
 export default function LeaderboardPage() {
-  const [tab, setTab] = useState("global");
+  const [tab, setTab] = useState<Scope>("global");
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["leaderboard"],
-    queryFn: statsApi.leaderboard,
+    queryKey: ["leaderboard", tab],
+    queryFn: () => statsApi.leaderboard(tab),
   });
 
   const results = data?.results ?? [];
   const me = data?.me;
   const meShown = me && results.some((r) => r.is_me);
+  const noBatch = tab === "batch" && data && !data.batch;
 
   return (
     <div>
@@ -77,7 +80,7 @@ export default function LeaderboardPage() {
             key={t.key}
             type="button"
             disabled={!t.enabled}
-            onClick={() => t.enabled && setTab(t.key)}
+            onClick={() => t.enabled && setTab(t.key as Scope)}
             className={cn(
               "rounded-[9px] border px-3.5 py-2 text-[13px] font-medium transition-colors",
               tab === t.key
@@ -90,6 +93,11 @@ export default function LeaderboardPage() {
             {t.label}
           </button>
         ))}
+        {data?.batch ? (
+          <span className="ml-1 self-center font-mono text-[12px] text-ink-mute">
+            ranking within <span className="text-tan">{data.batch.name}</span>
+          </span>
+        ) : null}
       </div>
 
       <div className="mt-4">
@@ -97,6 +105,11 @@ export default function LeaderboardPage() {
           <Loading label="Loading leaderboard…" />
         ) : error ? (
           <ErrorState message={apiErrorMessage(error)} onRetry={() => refetch()} />
+        ) : noBatch ? (
+          <EmptyState
+            title="You're not in a batch yet"
+            description="Ask your admin to add you to a cohort — then you'll see how you rank against your classmates."
+          />
         ) : results.length === 0 ? (
           <EmptyState title="No ranked learners yet" description="Solve a question to get on the board." />
         ) : (

@@ -166,6 +166,11 @@ export default function ProfilePage() {
                 <IconCheck className="size-[11px]" /> Verified
               </span>
             ) : null}
+            {user.batch_name ? (
+              <span className="rounded-full bg-tan-soft px-2 py-0.5 font-mono text-[10.5px] font-semibold text-tan">
+                {user.batch_name}
+              </span>
+            ) : null}
           </div>
           <div className="font-mono text-[12.5px] text-ink-mute">@{user.username} · {user.email}</div>
           <div className="mt-1.5 flex items-center gap-3 font-mono text-[12px] text-ink-mute">

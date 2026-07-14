@@ -61,7 +61,28 @@ export interface AdminUser {
   date_joined: string;
   score: number;
   solved: number;
+  batch: number | null;
+  batch_name: string | null;
 }
+
+// -------------------------------- batches -------------------------------
+export interface Batch {
+  id: number;
+  name: string;
+  code: string;
+  institution: string;
+  start_year: number | null;
+  description: string;
+  supervisor: number | null;
+  supervisor_name: string | null;
+  is_active: boolean;
+  created_at: string;
+  member_count: number;
+}
+
+export type BatchInput = Partial<
+  Pick<Batch, "name" | "institution" | "start_year" | "description" | "supervisor" | "is_active">
+>;
 
 export interface AdminUserSubmission {
   id: number;
@@ -109,11 +130,27 @@ export const adminApi = {
     api.get<Paginated<AdminUser>>("/admin/users", { params }).then((r) => r.data),
   user: (id: number) =>
     api.get<AdminUserDetail>(`/admin/users/${id}`).then((r) => r.data),
-  updateUser: (id: number, payload: { role?: Role; is_active?: boolean }) =>
-    api.patch<AdminUserDetail>(`/admin/users/${id}`, payload).then((r) => r.data),
+  updateUser: (
+    id: number,
+    payload: { role?: Role; is_active?: boolean; batch?: number | null },
+  ) => api.patch<AdminUserDetail>(`/admin/users/${id}`, payload).then((r) => r.data),
 
   submissions: (params: Record<string, string | undefined> = {}) =>
     api.get<Paginated<AdminSubmission>>("/admin/submissions", { params }).then((r) => r.data),
+
+  // batches (DRF router → trailing slashes)
+  batches: () => api.get<Paginated<Batch>>("/admin/batches/").then((r) => r.data.results),
+  createBatch: (payload: BatchInput) =>
+    api.post<Batch>("/admin/batches/", payload).then((r) => r.data),
+  updateBatch: (id: number, payload: BatchInput) =>
+    api.patch<Batch>(`/admin/batches/${id}/`, payload).then((r) => r.data),
+  deleteBatch: (id: number) => api.delete(`/admin/batches/${id}/`),
+  batchMembers: (id: number) =>
+    api.get<AdminUser[]>(`/admin/batches/${id}/members/`).then((r) => r.data),
+  assignMembers: (id: number, payload: { add?: number[]; remove?: number[] }) =>
+    api
+      .post<{ added: number; removed: number }>(`/admin/batches/${id}/assign/`, payload)
+      .then((r) => r.data),
 };
 
 export const ROLE_META: Record<Role, { label: string; cls: string }> = {

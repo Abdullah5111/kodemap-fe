@@ -18,6 +18,8 @@ export interface LeaderboardEntry {
 export interface LeaderboardResponse {
   results: LeaderboardEntry[];
   me: LeaderboardEntry | null;
+  scope: "global" | "batch";
+  batch: { id: number; name: string } | null;
 }
 
 export interface RecentSubmission {
@@ -44,7 +46,12 @@ export interface MyStats {
 }
 
 export const statsApi = {
-  leaderboard: () => api.get<LeaderboardResponse>("/leaderboard").then((r) => r.data),
+  leaderboard: (scope: "global" | "batch" = "global") =>
+    api
+      .get<LeaderboardResponse>("/leaderboard", {
+        params: scope === "batch" ? { scope: "batch" } : undefined,
+      })
+      .then((r) => r.data),
   myStats: () => api.get<MyStats>("/me/stats").then((r) => r.data),
 };
 

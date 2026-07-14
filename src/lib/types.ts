@@ -25,6 +25,8 @@ export interface User {
   last_active_date: string | null;
   is_email_verified: boolean;
   date_joined: string;
+  batch: number | null;
+  batch_name: string | null;
 }
 
 export interface TokenPair {
