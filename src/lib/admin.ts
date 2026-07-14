@@ -123,8 +123,73 @@ export interface AdminSubmission {
   created_at: string;
 }
 
+// -------------------------------- reports -------------------------------
+export type ReportName = "learners" | "questions";
+
+export interface LearnerReportRow {
+  user_id: number;
+  username: string;
+  full_name: string;
+  email: string;
+  batch: string;
+  institution: string;
+  score: number;
+  solved: number;
+  attempted: number;
+  submissions: number;
+  accepted: number;
+  accuracy: number;
+  completion: number;
+  streak: number;
+  last_active: string;
+}
+
+export interface QuestionReportRow {
+  question_id: number;
+  title: string;
+  slug: string;
+  difficulty: Difficulty;
+  score: number;
+  attempts: number;
+  attempters: number;
+  solvers: number;
+  solve_rate: number;
+  avg_attempts: number;
+}
+
+export interface ReportResponse<T> {
+  report: ReportName;
+  columns: string[];
+  count: number;
+  results: T[];
+  batches: { id: number; name: string }[];
+}
+
 export const adminApi = {
   overview: () => api.get<AdminOverview>("/admin/overview").then((r) => r.data),
+
+  report: <T>(name: ReportName, batch?: string) =>
+    api
+      .get<ReportResponse<T>>(`/admin/reports/${name}`, {
+        params: batch ? { batch } : undefined,
+      })
+      .then((r) => r.data),
+
+  /** Fetch the CSV as a blob (so the JWT header is sent) and save it. */
+  async downloadReport(name: ReportName, batch?: string) {
+    const res = await api.get(`/admin/reports/${name}`, {
+      params: { export: "csv", ...(batch ? { batch } : {}) },
+      responseType: "blob",
+    });
+    const url = URL.createObjectURL(res.data as Blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `kodemap-${name}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
 
   users: (params: Record<string, string | undefined> = {}) =>
     api.get<Paginated<AdminUser>>("/admin/users", { params }).then((r) => r.data),
