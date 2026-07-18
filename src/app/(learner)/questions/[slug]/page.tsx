@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Loading, ErrorState } from "@/components/ui/feedback";
 import { CodeEditor } from "@/components/solve/code-editor";
 import { ResultPanel } from "@/components/solve/result-panel";
+import { ExercisePanel } from "@/components/solve/exercise-panel";
 import { IconLock, IconCheck } from "@/components/ui/icons";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -128,19 +129,26 @@ export default function SolvePage() {
           <div className="mt-2.5 flex flex-wrap items-center gap-2">
             <DifficultyBadge difficulty={q.difficulty} />
             {q.topic_name ? <Tag>{q.topic_name}</Tag> : null}
-            <Tag>time {q.time_limit_ms}ms</Tag>
-            <Tag>mem {(q.memory_limit_kb / 1024).toFixed(0)}mb</Tag>
+            {/* Runtime limits only mean something when code is actually executed. */}
+            {q.kind === "exercise" ? (
+              <Tag>no coding</Tag>
+            ) : (
+              <>
+                <Tag>time {q.time_limit_ms}ms</Tag>
+                <Tag>mem {(q.memory_limit_kb / 1024).toFixed(0)}mb</Tag>
+              </>
+            )}
           </div>
 
           <Section title="Problem">
             <p className="whitespace-pre-wrap text-[14px] text-ink-dim">{q.statement}</p>
           </Section>
-          {q.input_format ? (
+          {q.kind !== "exercise" && q.input_format ? (
             <Section title="Input">
               <p className="whitespace-pre-wrap text-[14px] text-ink-dim">{q.input_format}</p>
             </Section>
           ) : null}
-          {q.output_format ? (
+          {q.kind !== "exercise" && q.output_format ? (
             <Section title="Output">
               <p className="whitespace-pre-wrap text-[14px] text-ink-dim">{q.output_format}</p>
             </Section>
@@ -152,7 +160,7 @@ export default function SolvePage() {
               </pre>
             </Section>
           ) : null}
-          {q.sample_testcases.length > 0 ? (
+          {q.kind !== "exercise" && q.sample_testcases.length > 0 ? (
             <Section title="Sample cases">
               <div className="flex flex-col gap-2.5">
                 {q.sample_testcases.map((c, i) => (
@@ -166,7 +174,16 @@ export default function SolvePage() {
           ) : null}
         </div>
 
-        {/* editor + result */}
+        {/* exercise (no compiler) or code editor + result */}
+        {q.kind === "exercise" && q.exercise ? (
+          <ExercisePanel
+            slug={slug}
+            exercise={q.exercise}
+            alreadySolved={q.is_solved}
+            locked={locked}
+            onSolved={() => void refetch()}
+          />
+        ) : (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col overflow-hidden rounded-2xl border border-line bg-surface">
             <div className="flex items-center gap-2 border-b border-line bg-elevated px-3 py-2">
@@ -226,6 +243,7 @@ export default function SolvePage() {
 
           <ResultPanel submission={submission} judging={judging} />
         </div>
+        )}
       </div>
     </div>
   );

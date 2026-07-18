@@ -150,6 +150,36 @@ export interface CsvImportResult {
   total: number;
 }
 
+// ----------------------------- exercises -----------------------------
+export type ExerciseType = "predict_output" | "fill_blank";
+
+export interface ExerciseBlankAdmin {
+  id: number;
+  exercise: number;
+  label: string;
+  sort_order: number;
+  accepted: string[];
+  case_sensitive: boolean;
+  collapse_whitespace: boolean;
+}
+
+export interface ExerciseAdmin {
+  id: number;
+  question: number;
+  type: ExerciseType;
+  code: string;
+  language_hint: string;
+  hint: string;
+  explanation: string;
+  blanks: ExerciseBlankAdmin[];
+}
+
+export interface ExerciseImportResult {
+  created: number;
+  questions: { id: number; title: string; slug: string }[];
+  errors: { row: number; error: string }[];
+}
+
 export const DIFFICULTY_META: Record<Difficulty, { label: string; score: number; cls: string }> = {
   very_easy: { label: "Very Easy", score: 5, cls: "text-d-vezy bg-d-vezy/12" },
   easy: { label: "Easy", score: 10, cls: "text-d-easy bg-d-easy/12" },
@@ -192,6 +222,26 @@ export const contentApi = {
   updateTestcase: (id: number, payload: Partial<Testcase>) =>
     api.patch<Testcase>(`/admin/testcases/${id}/`, payload).then((r) => r.data),
   deleteTestcase: (id: number) => api.delete(`/admin/testcases/${id}/`),
+  // exercises (compiler-free)
+  listExercises: () =>
+    api.get<Paginated<ExerciseAdmin>>("/admin/exercises/").then((r) => r.data),
+  createExercise: (payload: Partial<ExerciseAdmin>) =>
+    api.post<ExerciseAdmin>("/admin/exercises/", payload).then((r) => r.data),
+  updateExercise: (id: number, payload: Partial<ExerciseAdmin>) =>
+    api.patch<ExerciseAdmin>(`/admin/exercises/${id}/`, payload).then((r) => r.data),
+  createBlank: (payload: Partial<ExerciseBlankAdmin>) =>
+    api.post<ExerciseBlankAdmin>("/admin/exercise-blanks/", payload).then((r) => r.data),
+  updateBlank: (id: number, payload: Partial<ExerciseBlankAdmin>) =>
+    api.patch<ExerciseBlankAdmin>(`/admin/exercise-blanks/${id}/`, payload).then((r) => r.data),
+  deleteBlank: (id: number) => api.delete(`/admin/exercise-blanks/${id}/`),
+  importExercisesCsv: (file: File) => {
+    const fd = new FormData();
+    fd.append("file", file);
+    return api
+      .post<ExerciseImportResult>("/admin/exercises/import-csv/", fd)
+      .then((r) => r.data);
+  },
+
   importCsv: (questionId: number, file: File, replace: boolean) => {
     const fd = new FormData();
     fd.append("file", file);

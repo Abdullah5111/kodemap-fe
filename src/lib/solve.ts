@@ -8,8 +8,47 @@ export interface SampleTestcase {
   sort_order: number;
 }
 
+export type QuestionKind = "code" | "exercise";
+export type ExerciseType = "predict_output" | "fill_blank";
+
+export interface ExerciseBlank {
+  id: number;
+  label: string;
+  sort_order: number;
+}
+
+/** Learner view of an exercise — never carries the accepted answers. */
+export interface ExerciseDetail {
+  id: number;
+  type: ExerciseType;
+  code: string;
+  language_hint: string;
+  hint: string;
+  blanks: ExerciseBlank[];
+}
+
+export interface ExerciseBlankResult {
+  sort_order: number;
+  label: string;
+  is_correct: boolean;
+}
+
+export interface ExerciseAttempt {
+  submission_id: number;
+  status: SubmissionStatus;
+  is_correct: boolean;
+  passed_count: number;
+  total_count: number;
+  score_awarded: number;
+  results: ExerciseBlankResult[];
+  /** Only present once correct — otherwise it would be the answer key. */
+  explanation: string;
+  hint: string;
+}
+
 export interface QuestionDetail {
   id: number;
+  kind: QuestionKind;
   title: string;
   slug: string;
   statement: string;
@@ -25,6 +64,7 @@ export interface QuestionDetail {
   sample_testcases: SampleTestcase[];
   is_solved: boolean;
   is_unlocked: boolean;
+  exercise: ExerciseDetail | null;
 }
 
 export type SubmissionStatus =
@@ -123,6 +163,10 @@ export const solveApi = {
     api.post<Submission>(`/questions/${slug}/submit`, body).then((r) => r.data),
   getSubmission: (id: number) =>
     api.get<Submission>(`/submissions/${id}`).then((r) => r.data),
+  attemptExercise: (slug: string, answers: string[]) =>
+    api
+      .post<ExerciseAttempt>(`/questions/${slug}/exercise`, { answers })
+      .then((r) => r.data),
   history: (slug: string) =>
     api
       .get<Paginated<SubmissionListItem>>("/submissions", { params: { question: slug } })

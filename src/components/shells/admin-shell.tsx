@@ -56,6 +56,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <NavItem href="/admin" label="Dashboard" icon={<IconDashboard />} exact />
           <SideCap>Content</SideCap>
           <NavItem href="/admin/questions" label="Questions" icon={<IconQuestions />} />
+          <NavItem href="/admin/exercises" label="Exercises" icon={<IconList />} />
           <NavItem href="/admin/testcases" label="Test cases" icon={<IconTests />} />
           <NavItem href="/admin/roadmap" label="Tracks & roadmap" icon={<IconRoadmap />} />
           <SideCap>People</SideCap>
