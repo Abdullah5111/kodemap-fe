@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/cn";
-import { STATUS_META, type Submission } from "@/lib/solve";
+import { statusMeta, type Submission } from "@/lib/solve";
 
 const TONE: Record<string, string> = {
   ok: "text-ok bg-ok-soft",
@@ -42,7 +42,7 @@ export function ResultPanel({
   }
 
   const status = submission?.status ?? "processing";
-  const meta = STATUS_META[status];
+  const meta = statusMeta(status);
   const done = !!submission && !judging && meta.tone !== "run";
   const isRun = submission?.mode === "run";
 

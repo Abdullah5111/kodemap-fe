@@ -149,6 +149,14 @@ export function isTerminal(status: SubmissionStatus): boolean {
   return TERMINAL_STATUSES.includes(status);
 }
 
+/** Never let an unrecognized status crash the UI: fall back to a neutral label
+    instead of reading `.tone`/`.label` off `undefined`. */
+export function statusMeta(status: string) {
+  return (
+    STATUS_META[status as SubmissionStatus] ?? { label: status || "Unknown", tone: "run" as const }
+  );
+}
+
 interface RunInput {
   language_id: number;
   source_code: string;

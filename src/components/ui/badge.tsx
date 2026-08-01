@@ -1,6 +1,6 @@
 import { cn } from "@/lib/cn";
 import { DIFFICULTY_META, type Difficulty } from "@/lib/content";
-import { STATUS_META, type SubmissionStatus } from "@/lib/solve";
+import { statusMeta, type SubmissionStatus } from "@/lib/solve";
 
 const STATUS_TONE: Record<string, string> = {
   ok: "text-ok bg-ok-soft",
@@ -10,7 +10,7 @@ const STATUS_TONE: Record<string, string> = {
 };
 
 export function StatusPill({ status }: { status: SubmissionStatus }) {
-  const meta = STATUS_META[status];
+  const meta = statusMeta(status);
   return (
     <span
       className={cn(

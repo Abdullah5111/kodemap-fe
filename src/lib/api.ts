@@ -9,7 +9,22 @@ import { tokens } from "./tokens";
 export const api = axios.create({
   baseURL: API_URL,
   headers: { "Content-Type": "application/json" },
+  // Never let a stalled/half-open connection hang a spinner forever.
+  timeout: 20_000,
 });
+
+/**
+ * Broadcast an unrecoverable auth failure so the AuthProvider can drop the user
+ * and redirect to login — instead of leaving a zombie "logged-in" shell whose
+ * every request silently 401s.
+ */
+export const AUTH_LOGOUT_EVENT = "kodemap:auth-logout";
+function forceLogout() {
+  tokens.clear();
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(AUTH_LOGOUT_EVENT));
+  }
+}
 
 api.interceptors.request.use((cfg: InternalAxiosRequestConfig) => {
   const access = tokens.access;
@@ -44,15 +59,19 @@ api.interceptors.response.use(
     const status = error.response?.status;
 
     // Only try to refresh once per request, and never for the refresh call itself.
-    if (status === 401 && original && !original._retry && tokens.refresh) {
-      original._retry = true;
-      refreshing = refreshing ?? refreshAccess();
-      const newAccess = await refreshing;
-      refreshing = null;
-      if (newAccess) {
-        original.headers = { ...original.headers, Authorization: `Bearer ${newAccess}` };
-        return api(original);
+    if (status === 401 && original && !original._retry) {
+      if (tokens.refresh) {
+        original._retry = true;
+        refreshing = refreshing ?? refreshAccess();
+        const newAccess = await refreshing;
+        refreshing = null;
+        if (newAccess) {
+          original.headers = { ...original.headers, Authorization: `Bearer ${newAccess}` };
+          return api(original);
+        }
       }
+      // No refresh token, or refresh failed → the session is truly over.
+      forceLogout();
     }
     return Promise.reject(error);
   },

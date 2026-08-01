@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { AUTH_LOGOUT_EVENT } from "@/lib/api";
 import { authApi } from "@/lib/auth-api";
 import { tokens } from "@/lib/tokens";
 import type { User } from "@/lib/types";
@@ -44,6 +45,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  // When the API layer hits an unrecoverable 401 (refresh expired/failed), it
+  // broadcasts a logout so we drop the user immediately instead of showing a
+  // zombie authenticated shell whose every request silently 401s.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onLogout = () => setUser(null);
+    window.addEventListener(AUTH_LOGOUT_EVENT, onLogout);
+    return () => window.removeEventListener(AUTH_LOGOUT_EVENT, onLogout);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, loading, refresh, logout }}>

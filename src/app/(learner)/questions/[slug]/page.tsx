@@ -61,15 +61,25 @@ export default function SolvePage() {
       const call = mode === "run" ? solveApi.run : solveApi.submit;
       let sub = await call(slug, { language_id: langId, source_code: source });
       setSubmission(sub);
-      // Poll if the backend is still judging (real Judge0). Fake mode returns terminal.
+      // Poll while the backend is still judging. Tolerate a transient network blip
+      // (keep polling — the verdict is still cooking server-side) and stop with a
+      // clear message if it never settles, rather than spinning forever.
       let guard = 0;
+      let misses = 0;
       while (!isTerminal(sub.status) && guard < 60) {
         await sleep(1200);
-        sub = await solveApi.getSubmission(sub.id);
-        setSubmission(sub);
         guard += 1;
+        try {
+          sub = await solveApi.getSubmission(sub.id);
+          setSubmission(sub);
+          misses = 0;
+        } catch {
+          if (++misses >= 5) throw new Error("Lost connection while judging.");
+        }
       }
-      if (mode === "submit" && sub.status === "accepted") {
+      if (!isTerminal(sub.status)) {
+        setRunError("Judging is taking longer than usual. Please try again.");
+      } else if (mode === "submit" && sub.status === "accepted") {
         void refetch();
       }
     } catch (err) {
