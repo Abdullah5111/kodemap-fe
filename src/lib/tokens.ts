@@ -1,25 +1,21 @@
-import { TOKEN_KEYS } from "./config";
-import type { TokenPair } from "./types";
+/**
+ * Access-token storage — IN MEMORY ONLY.
+ *
+ * The refresh token is NOT stored here: it lives in an httpOnly cookie the browser
+ * manages, so JavaScript (and therefore any XSS) can never read it. Only the
+ * short-lived access token is held here, and only for the lifetime of the tab —
+ * a reload re-bootstraps it from the refresh cookie via /auth/refresh.
+ */
+let accessToken: string | null = null;
 
-/** Access/refresh token storage. localStorage for MVP; swap for httpOnly cookies later. */
 export const tokens = {
   get access(): string | null {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(TOKEN_KEYS.access);
+    return accessToken;
   },
-  get refresh(): string | null {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(TOKEN_KEYS.refresh);
-  },
-  set({ access, refresh }: TokenPair) {
-    localStorage.setItem(TOKEN_KEYS.access, access);
-    localStorage.setItem(TOKEN_KEYS.refresh, refresh);
-  },
-  setAccess(access: string) {
-    localStorage.setItem(TOKEN_KEYS.access, access);
+  setAccess(access: string | null) {
+    accessToken = access;
   },
   clear() {
-    localStorage.removeItem(TOKEN_KEYS.access);
-    localStorage.removeItem(TOKEN_KEYS.refresh);
+    accessToken = null;
   },
 };

@@ -3,7 +3,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { AUTH_LOGOUT_EVENT } from "@/lib/api";
 import { authApi } from "@/lib/auth-api";
-import { tokens } from "@/lib/tokens";
 import type { User } from "@/lib/types";
 
 interface AuthState {
@@ -20,12 +19,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    if (!tokens.access && !tokens.refresh) {
-      setUser(null);
-      setLoading(false);
-      return null;
-    }
     try {
+      // On a cold load there's no in-memory access token; hitting /me triggers the
+      // api layer to mint one from the httpOnly refresh cookie (if the session is
+      // still valid). No cookie ⇒ 401 ⇒ we settle as logged-out.
       const me = await authApi.me();
       setUser(me);
       return me;
@@ -38,8 +35,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const logout = useCallback(() => {
-    authApi.logout();
+    // Clear the UI immediately; blacklist + cookie-clear happen in the background.
     setUser(null);
+    void authApi.logout();
   }, []);
 
   useEffect(() => {

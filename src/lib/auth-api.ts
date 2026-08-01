@@ -1,6 +1,12 @@
 import { api } from "./api";
 import { tokens } from "./tokens";
-import type { TokenPair, User } from "./types";
+import type { User } from "./types";
+
+/** Auth endpoints return the access token in the body; the refresh token is
+    delivered separately as an httpOnly cookie the browser stores automatically. */
+interface AccessResponse {
+  access: string;
+}
 
 export interface ProfileUpdate {
   full_name?: string;
@@ -32,24 +38,23 @@ export const authApi = {
     await api.post("/auth/register", payload);
   },
 
-  /** Verify the signup OTP; on success the backend returns tokens and we store them. */
-  async verifyEmail(email: string, code: string): Promise<TokenPair> {
-    const { data } = await api.post<TokenPair & { detail: string }>("/auth/verify-email", {
-      email,
-      code,
-    });
-    tokens.set({ access: data.access, refresh: data.refresh });
-    return data;
+  /** Verify the signup OTP; on success the backend returns an access token (and
+      sets the refresh cookie), and we keep the access token in memory. */
+  async verifyEmail(email: string, code: string): Promise<void> {
+    const { data } = await api.post<AccessResponse & { detail: string }>(
+      "/auth/verify-email",
+      { email, code },
+    );
+    tokens.setAccess(data.access);
   },
 
   async resendOtp(email: string): Promise<void> {
     await api.post("/auth/resend-otp", { email });
   },
 
-  async login(email: string, password: string): Promise<TokenPair> {
-    const { data } = await api.post<TokenPair>("/auth/login", { email, password });
-    tokens.set(data);
-    return data;
+  async login(email: string, password: string): Promise<void> {
+    const { data } = await api.post<AccessResponse>("/auth/login", { email, password });
+    tokens.setAccess(data.access);
   },
 
   async requestReset(email: string): Promise<void> {
@@ -82,7 +87,14 @@ export const authApi = {
     return data;
   },
 
-  logout() {
+  /** Clear server-side (blacklist refresh + expire the cookie), then drop the
+      in-memory access token. Backend failure still clears locally. */
+  async logout(): Promise<void> {
+    try {
+      await api.post("/auth/logout");
+    } catch {
+      // best effort — clear locally regardless
+    }
     tokens.clear();
   },
 };

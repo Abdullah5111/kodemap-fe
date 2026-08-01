@@ -11,6 +11,9 @@ export const api = axios.create({
   headers: { "Content-Type": "application/json" },
   // Never let a stalled/half-open connection hang a spinner forever.
   timeout: 20_000,
+  // Send/receive the httpOnly refresh cookie on the credentialed cross-origin
+  // calls to the API (login sets it, refresh rotates it, logout clears it).
+  withCredentials: true,
 });
 
 /**
@@ -36,13 +39,12 @@ api.interceptors.request.use((cfg: InternalAxiosRequestConfig) => {
 let refreshing: Promise<string | null> | null = null;
 
 async function refreshAccess(): Promise<string | null> {
-  const refresh = tokens.refresh;
-  if (!refresh) return null;
   try {
+    // The refresh token rides along as the httpOnly cookie — no body needed.
     const { data } = await axios.post<{ access: string }>(
       `${API_URL}/auth/refresh`,
-      { refresh },
-      { headers: { "Content-Type": "application/json" } },
+      {},
+      { headers: { "Content-Type": "application/json" }, withCredentials: true },
     );
     tokens.setAccess(data.access);
     return data.access;
@@ -58,19 +60,18 @@ api.interceptors.response.use(
     const original = error.config as (AxiosRequestConfig & { _retry?: boolean }) | undefined;
     const status = error.response?.status;
 
-    // Only try to refresh once per request, and never for the refresh call itself.
+    // Only try to refresh once per request, and never for the refresh call itself
+    // (that one uses a bare axios call, so it never hits this interceptor).
     if (status === 401 && original && !original._retry) {
-      if (tokens.refresh) {
-        original._retry = true;
-        refreshing = refreshing ?? refreshAccess();
-        const newAccess = await refreshing;
-        refreshing = null;
-        if (newAccess) {
-          original.headers = { ...original.headers, Authorization: `Bearer ${newAccess}` };
-          return api(original);
-        }
+      original._retry = true;
+      refreshing = refreshing ?? refreshAccess();
+      const newAccess = await refreshing;
+      refreshing = null;
+      if (newAccess) {
+        original.headers = { ...original.headers, Authorization: `Bearer ${newAccess}` };
+        return api(original);
       }
-      // No refresh token, or refresh failed → the session is truly over.
+      // Refresh cookie missing/expired → the session is truly over.
       forceLogout();
     }
     return Promise.reject(error);
