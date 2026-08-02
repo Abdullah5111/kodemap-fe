@@ -9,6 +9,13 @@ export interface SampleTestcase {
 }
 
 export type QuestionKind = "code" | "exercise";
+export type IOMode = "stdin" | "function";
+
+/** Learner-facing per-language starter stub (never the hidden harness). */
+export interface CodeStub {
+  language: number;
+  starter_code: string;
+}
 export type ExerciseType = "predict_output" | "fill_blank";
 
 export interface ExerciseBlank {
@@ -49,6 +56,7 @@ export interface ExerciseAttempt {
 export interface QuestionDetail {
   id: number;
   kind: QuestionKind;
+  io_mode: IOMode;
   title: string;
   slug: string;
   statement: string;
@@ -65,6 +73,8 @@ export interface QuestionDetail {
   is_solved: boolean;
   is_unlocked: boolean;
   exercise: ExerciseDetail | null;
+  /** Present only for "complete the function" (io_mode === "function") questions. */
+  stubs: CodeStub[];
 }
 
 export type SubmissionStatus =
@@ -193,6 +203,16 @@ export function monacoLang(name: string): string {
 }
 
 // A tiny starter template per language so the editor isn't empty.
+/** Seed code for the editor: the question's per-language function stub when it's
+    a "complete the function" question, otherwise the generic language starter. */
+export function initialSource(q: QuestionDetail, lang: Language): string {
+  if (q.io_mode === "function") {
+    const stub = q.stubs?.find((s) => s.language === lang.id);
+    if (stub?.starter_code) return stub.starter_code;
+  }
+  return starterCode(lang.name);
+}
+
 export function starterCode(name: string): string {
   const n = name.toLowerCase();
   if (n.includes("python")) return "import sys\n\ndef main():\n    data = sys.stdin.read().split()\n    # your solution\n\nmain()\n";

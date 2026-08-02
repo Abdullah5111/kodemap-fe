@@ -92,6 +92,8 @@ export interface QuestionListItem {
   created_at: string;
 }
 
+export type IOMode = "stdin" | "function";
+
 export interface QuestionAdmin {
   id: number;
   title: string;
@@ -107,6 +109,7 @@ export interface QuestionAdmin {
   memory_limit_kb: number;
   allowed_languages: number[];
   is_active: boolean;
+  io_mode: IOMode;
   created_by: number | null;
   created_at: string;
   updated_at: string;
@@ -130,8 +133,19 @@ export type QuestionInput = Partial<
     | "memory_limit_kb"
     | "allowed_languages"
     | "is_active"
+    | "io_mode"
   >
 >;
+
+/** Per-language authoring for a "complete the function" question. */
+export interface QuestionCodeStub {
+  id: number;
+  question: number;
+  language: number;
+  language_name: string;
+  starter_code: string;
+  harness: string;
+}
 
 export interface Testcase {
   id: number;
@@ -233,6 +247,19 @@ export const contentApi = {
     api.get<Testcase[]>(`/admin/questions/${id}/testcases/`).then((r) => r.data),
   createTestcase: (payload: Partial<Testcase>) =>
     api.post<Testcase>("/admin/testcases/", payload).then((r) => r.data),
+
+  // function-mode code stubs (starter + hidden harness), per (question, language)
+  questionStubs: (questionId: number) =>
+    api
+      .get<Paginated<QuestionCodeStub>>("/admin/question-stubs/", {
+        params: { question: questionId },
+      })
+      .then((r) => r.data.results),
+  createStub: (payload: Partial<QuestionCodeStub>) =>
+    api.post<QuestionCodeStub>("/admin/question-stubs/", payload).then((r) => r.data),
+  updateStub: (id: number, payload: Partial<QuestionCodeStub>) =>
+    api.patch<QuestionCodeStub>(`/admin/question-stubs/${id}/`, payload).then((r) => r.data),
+  deleteStub: (id: number) => api.delete(`/admin/question-stubs/${id}/`),
   updateTestcase: (id: number, payload: Partial<Testcase>) =>
     api.patch<Testcase>(`/admin/testcases/${id}/`, payload).then((r) => r.data),
   deleteTestcase: (id: number) => api.delete(`/admin/testcases/${id}/`),

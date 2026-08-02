@@ -7,6 +7,7 @@ import {
   DIFFICULTY_ORDER,
   DIFFICULTY_META,
   type Difficulty,
+  type IOMode,
   type QuestionAdmin,
   type QuestionInput,
 } from "@/lib/content";
@@ -27,6 +28,7 @@ export function QuestionForm({ mode, question, onSaved }: Props) {
 
   const [title, setTitle] = useState(question?.title ?? "");
   const [difficulty, setDifficulty] = useState<Difficulty>(question?.difficulty ?? "easy");
+  const [ioMode, setIoMode] = useState<IOMode>(question?.io_mode ?? "stdin");
   const [score, setScore] = useState(question?.score ? String(question.score) : "");
   const [topic, setTopic] = useState(question?.topic ? String(question.topic) : "");
   const [statement, setStatement] = useState(question?.statement ?? "");
@@ -68,6 +70,7 @@ export function QuestionForm({ mode, question, onSaved }: Props) {
       memory_limit_kb: Number(memoryLimit) || 128000,
       allowed_languages: [...langs],
       is_active: isActive,
+      io_mode: ioMode,
     };
 
     setSaving(true);
@@ -147,6 +150,20 @@ export function QuestionForm({ mode, question, onSaved }: Props) {
             <Input type="number" value={memoryLimit} onChange={(e) => setMemoryLimit(e.target.value)} />
           </Field>
         </div>
+
+        <Field
+          label="Answer format"
+          hint={
+            ioMode === "function"
+              ? "Learners complete a function and return the result — add per-language stubs below (edit view). Test-case input is the arguments; expected output is the return."
+              : "Learners write a full program that reads stdin and prints stdout."
+          }
+        >
+          <Select value={ioMode} onChange={(e) => setIoMode(e.target.value as IOMode)}>
+            <option value="stdin">Standard input / output</option>
+            <option value="function">Complete the function (LeetCode style)</option>
+          </Select>
+        </Field>
 
         <div>
           <span className="font-mono text-[12px] text-ink-dim">Allowed languages</span>

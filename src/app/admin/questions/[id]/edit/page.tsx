@@ -8,6 +8,7 @@ import { contentApi } from "@/lib/content";
 import { apiErrorMessage } from "@/lib/api";
 import { QuestionForm } from "@/components/admin/question-form";
 import { TestcasePanel } from "@/components/admin/testcase-panel";
+import { StubPanel } from "@/components/admin/stub-panel";
 import { DifficultyBadge, StatusDot } from "@/components/ui/badge";
 import { Loading, ErrorState } from "@/components/ui/feedback";
 
@@ -53,6 +54,9 @@ export default function EditQuestionPage() {
                 setTimeout(() => setSaved(false), 2500);
               }}
             />
+            {data.io_mode === "function" ? (
+              <StubPanel questionId={id} allowedLanguageIds={data.allowed_languages} />
+            ) : null}
             <TestcasePanel questionId={id} />
           </div>
         </>

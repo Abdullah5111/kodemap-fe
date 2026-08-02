@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { BackLink } from "@/components/ui/back-link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { solveApi, isTerminal, monacoLang, starterCode, type Submission } from "@/lib/solve";
+import { solveApi, isTerminal, monacoLang, initialSource, type Submission } from "@/lib/solve";
 import { apiErrorMessage } from "@/lib/api";
 import { DifficultyBadge, Tag } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,14 +31,13 @@ export default function SolvePage() {
   const [judging, setJudging] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
 
-  // pick a default language once the question loads
-  useEffect(() => {
-    if (q && langId === null && q.allowed_languages.length > 0) {
-      const first = q.allowed_languages[0];
-      setLangId(first.id);
-      setSources((s) => ({ ...s, [first.id]: s[first.id] ?? starterCode(first.name) }));
-    }
-  }, [q, langId]);
+  // Pick a default language + seed its editor once the question loads. Done
+  // during render (guarded by langId === null so it runs once), not in an effect.
+  if (q && langId === null && q.allowed_languages.length > 0) {
+    const first = q.allowed_languages[0];
+    setLangId(first.id);
+    setSources((s) => (s[first.id] !== undefined ? s : { ...s, [first.id]: initialSource(q, first) }));
+  }
 
   const language = useMemo(
     () => q?.allowed_languages.find((l) => l.id === langId) ?? null,
@@ -49,7 +48,10 @@ export default function SolvePage() {
   function selectLang(id: number) {
     const lang = q?.allowed_languages.find((l) => l.id === id);
     setLangId(id);
-    setSources((s) => ({ ...s, [id]: s[id] ?? (lang ? starterCode(lang.name) : "") }));
+    setSources((s) => ({
+      ...s,
+      [id]: s[id] ?? (q && lang ? initialSource(q, lang) : ""),
+    }));
   }
 
   async function judge(mode: "run" | "submit") {
