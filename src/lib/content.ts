@@ -180,6 +180,20 @@ export interface ExerciseImportResult {
   errors: { row: number; error: string }[];
 }
 
+export interface ExerciseAuthorInput {
+  type: ExerciseType;
+  title: string;
+  code: string;
+  /** One entry per blank; predict_output has exactly one. */
+  blanks: { accepted: string[] }[];
+  difficulty?: Difficulty;
+  statement?: string;
+  explanation?: string;
+  hint?: string;
+  language_hint?: string;
+  lesson_id?: string;
+}
+
 export const DIFFICULTY_META: Record<Difficulty, { label: string; score: number; cls: string }> = {
   very_easy: { label: "Very Easy", score: 5, cls: "text-d-vezy bg-d-vezy/12" },
   easy: { label: "Easy", score: 10, cls: "text-d-easy bg-d-easy/12" },
@@ -225,6 +239,14 @@ export const contentApi = {
   // exercises (compiler-free)
   listExercises: () =>
     api.get<Paginated<ExerciseAdmin>>("/admin/exercises/").then((r) => r.data),
+  // Author a single exercise (creates its backing Question + blanks server-side).
+  authorExercise: (payload: ExerciseAuthorInput) =>
+    api
+      .post<{ id: number; title: string; slug: string }>(
+        "/admin/exercises/author/",
+        payload,
+      )
+      .then((r) => r.data),
   createExercise: (payload: Partial<ExerciseAdmin>) =>
     api.post<ExerciseAdmin>("/admin/exercises/", payload).then((r) => r.data),
   updateExercise: (id: number, payload: Partial<ExerciseAdmin>) =>

@@ -1,14 +1,20 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   contentApi,
+  DIFFICULTY_ORDER,
+  DIFFICULTY_META,
+  type Difficulty,
   type ExerciseAdmin,
   type ExerciseImportResult,
+  type ExerciseType,
 } from "@/lib/content";
 import { apiErrorMessage } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import { Input, Textarea, Field } from "@/components/ui/field";
+import { Select } from "@/components/ui/select";
 import { Loading, ErrorState, EmptyState } from "@/components/ui/feedback";
 import { cn } from "@/lib/cn";
 
@@ -30,6 +36,7 @@ export default function AdminExercisesPage() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [result, setResult] = useState<ExerciseImportResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showAdd, setShowAdd] = useState(false);
 
   const { data, isLoading, error: loadError, refetch } = useQuery({
     queryKey: ["admin-exercises"],
@@ -68,16 +75,23 @@ export default function AdminExercisesPage() {
       <p className="font-mono text-[12px] text-ink-mute">admin / content / exercises</p>
       <div className="mt-1 flex flex-wrap items-end justify-between gap-3">
         <h1 className="text-[clamp(20px,3vw,25px)] font-bold tracking-tight">Exercises</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="ghost" size="sm" onClick={downloadTemplate}>
             CSV template
           </Button>
           <Button
+            variant="ghost"
             size="sm"
             onClick={() => fileRef.current?.click()}
             disabled={importCsv.isPending}
           >
             {importCsv.isPending ? "Importing…" : "Import CSV"}
+          </Button>
+          <Button size="sm" onClick={() => setShowAdd(true)}>
+            <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            New exercise
           </Button>
           <input
             ref={fileRef}
@@ -222,6 +236,269 @@ export default function AdminExercisesPage() {
             </table>
           </div>
         )}
+      </div>
+
+      {showAdd ? (
+        <AddExerciseModal
+          onClose={() => setShowAdd(false)}
+          onCreated={() => {
+            setShowAdd(false);
+            qc.invalidateQueries({ queryKey: ["admin-exercises"] });
+            qc.invalidateQueries({ queryKey: ["admin-questions"] });
+          }}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+// --- manual authoring modal -------------------------------------------------
+function AddExerciseModal({
+  onClose,
+  onCreated,
+}: {
+  onClose: () => void;
+  onCreated: () => void;
+}) {
+  const [type, setType] = useState<ExerciseType>("predict_output");
+  const [title, setTitle] = useState("");
+  const [difficulty, setDifficulty] = useState<Difficulty>("very_easy");
+  const [statement, setStatement] = useState("");
+  const [code, setCode] = useState("");
+  const [languageHint, setLanguageHint] = useState("python");
+  const [explanation, setExplanation] = useState("");
+  const [hint, setHint] = useState("");
+  // predict_output: one expected-output value (alternatives via new lines)
+  const [expected, setExpected] = useState("");
+  // fill_blank: one "alternatives" string per ____ gap (alternatives via |)
+  const [blankAnswers, setBlankAnswers] = useState<string[]>([]);
+  const [err, setErr] = useState<string | null>(null);
+
+  const gaps = useMemo(() => (code.match(/____/g) || []).length, [code]);
+
+  // keep one answer input per detected gap
+  const blanks = useMemo(() => {
+    const next = Array.from({ length: gaps }, (_, i) => blankAnswers[i] ?? "");
+    return next;
+  }, [gaps, blankAnswers]);
+
+  function setBlank(i: number, value: string) {
+    setBlankAnswers((prev) => {
+      const next = Array.from({ length: gaps }, (_, k) => prev[k] ?? "");
+      next[i] = value;
+      return next;
+    });
+  }
+
+  const create = useMutation({
+    mutationFn: () => {
+      const payloadBlanks =
+        type === "fill_blank"
+          ? blanks.map((b) => ({
+              accepted: b.split("|").map((a) => a.trim()).filter(Boolean),
+            }))
+          : [
+              {
+                accepted: expected
+                  .split("\n")
+                  .map((a) => a.trim())
+                  .filter(Boolean),
+              },
+            ];
+      return contentApi.authorExercise({
+        type,
+        title,
+        code,
+        blanks: payloadBlanks,
+        difficulty,
+        statement,
+        explanation,
+        hint,
+        language_hint: languageHint,
+      });
+    },
+    onSuccess: onCreated,
+    onError: (e) => setErr(apiErrorMessage(e, "Couldn't create the exercise.")),
+  });
+
+  function submit() {
+    setErr(null);
+    if (!title.trim()) return setErr("Title is required.");
+    if (!code.trim()) return setErr("Code snippet is required.");
+    if (type === "fill_blank") {
+      if (gaps === 0)
+        return setErr("Add at least one ____ marker in the code for a fill-in-the-blank.");
+      if (blanks.some((b) => b.split("|").every((a) => !a.trim())))
+        return setErr("Every blank needs at least one accepted answer.");
+    } else if (!expected.trim()) {
+      return setErr("Enter the expected output.");
+    }
+    create.mutate();
+  }
+
+  return (
+    <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto p-4 sm:p-8">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden />
+      <div className="relative z-10 w-full max-w-[640px] rounded-2xl border border-line bg-surface p-5 shadow-[var(--shadow)]">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[17px] font-bold">New exercise</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md p-1 text-ink-mute hover:bg-ground hover:text-ink"
+            aria-label="Close"
+          >
+            <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="mt-4 flex flex-col gap-3.5">
+          <div className="grid gap-3.5 sm:grid-cols-2">
+            <Field label="Type" htmlFor="ex-type">
+              <Select
+                id="ex-type"
+                value={type}
+                onChange={(e) => setType(e.target.value as ExerciseType)}
+              >
+                <option value="predict_output">Predict output</option>
+                <option value="fill_blank">Fill in the blank</option>
+              </Select>
+            </Field>
+            <Field label="Difficulty" htmlFor="ex-diff">
+              <Select
+                id="ex-diff"
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value as Difficulty)}
+              >
+                {DIFFICULTY_ORDER.map((d) => (
+                  <option key={d} value={d}>
+                    {DIFFICULTY_META[d].label}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          </div>
+
+          <Field label="Title" htmlFor="ex-title">
+            <Input
+              id="ex-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Counting up"
+            />
+          </Field>
+
+          <Field label="Statement" htmlFor="ex-stmt" hint="The prompt shown above the snippet.">
+            <Textarea
+              id="ex-stmt"
+              value={statement}
+              onChange={(e) => setStatement(e.target.value)}
+              placeholder="What does this print?"
+            />
+          </Field>
+
+          <Field
+            label="Code snippet"
+            htmlFor="ex-code"
+            hint={
+              type === "fill_blank"
+                ? "Mark each gap with ____ (four underscores)."
+                : "The snippet the learner reads."
+            }
+          >
+            <Textarea
+              id="ex-code"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              className="min-h-[120px] font-mono text-[13px]"
+              placeholder={
+                type === "fill_blank"
+                  ? "for i in ____(1, ____):\n    print(i)"
+                  : "for i in range(3):\n    print(i)"
+              }
+            />
+          </Field>
+
+          {type === "fill_blank" ? (
+            gaps === 0 ? (
+              <p className="rounded-lg border border-warn/40 bg-warn-soft px-3 py-2 text-[12.5px] text-warn">
+                Add <code className="font-mono">____</code> markers in the code to create blanks.
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2.5 rounded-xl border border-line bg-ground p-3.5">
+                <p className="font-mono text-[11.5px] text-ink-mute">
+                  {gaps} blank{gaps === 1 ? "" : "s"} detected · separate alternatives with{" "}
+                  <code className="text-ember">|</code>
+                </p>
+                {blanks.map((b, i) => (
+                  <Field key={i} label={`Blank ${i + 1} — accepted answers`}>
+                    <Input
+                      value={b}
+                      onChange={(e) => setBlank(i, e.target.value)}
+                      placeholder="range|xrange"
+                      className="font-mono text-[13px]"
+                    />
+                  </Field>
+                ))}
+              </div>
+            )
+          ) : (
+            <Field
+              label="Expected output"
+              htmlFor="ex-expected"
+              hint="Exactly what the snippet prints. One acceptable variant per line."
+            >
+              <Textarea
+                id="ex-expected"
+                value={expected}
+                onChange={(e) => setExpected(e.target.value)}
+                className="font-mono text-[13px]"
+                placeholder={"0\n1\n2"}
+              />
+            </Field>
+          )}
+
+          <div className="grid gap-3.5 sm:grid-cols-2">
+            <Field label="Language" htmlFor="ex-lang" hint="For syntax highlighting.">
+              <Input
+                id="ex-lang"
+                value={languageHint}
+                onChange={(e) => setLanguageHint(e.target.value)}
+                placeholder="python"
+              />
+            </Field>
+            <Field label="Hint" htmlFor="ex-hint" hint="Shown while the answer is wrong.">
+              <Input
+                id="ex-hint"
+                value={hint}
+                onChange={(e) => setHint(e.target.value)}
+                placeholder="Start at zero."
+              />
+            </Field>
+          </div>
+
+          <Field label="Explanation" htmlFor="ex-expl" hint="Revealed once the learner is correct.">
+            <Textarea
+              id="ex-expl"
+              value={explanation}
+              onChange={(e) => setExplanation(e.target.value)}
+              placeholder="range(3) yields 0 1 2 — it stops before 3."
+            />
+          </Field>
+
+          {err ? <p className="text-[13px] text-bad">{err}</p> : null}
+
+          <div className="flex justify-end gap-2 border-t border-line pt-3.5">
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button size="sm" disabled={create.isPending} onClick={submit}>
+              {create.isPending ? "Creating…" : "Create exercise"}
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
