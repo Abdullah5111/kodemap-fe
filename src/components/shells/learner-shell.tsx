@@ -19,7 +19,7 @@ export function LearnerShell({ children }: { children: React.ReactNode }) {
   if (!user) return null;
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[1240px] flex-col">
+    <div className="flex min-h-dvh flex-col">
       {/* top bar */}
       <header className="flex items-center gap-3 border-b border-line bg-surface px-4 py-3">
         <Logo />
