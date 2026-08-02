@@ -53,7 +53,7 @@ export default function AdminQuestionsPage() {
 
       {/* toolbar */}
       <div className="mt-4 flex flex-wrap items-center gap-2.5">
-        <div className="flex min-w-[200px] flex-1 items-center gap-2 rounded-[9px] border border-line bg-surface px-3 py-2 font-mono text-[13px] text-ink-mute">
+        <div className="flex min-w-[200px] flex-1 items-center gap-2 rounded-[9px] border border-line bg-surface px-3 py-2 font-mono text-[13px] text-ink-mute transition-colors focus-within:border-ember-line">
           <IconSearch className="size-[15px]" />
           <input
             value={search}

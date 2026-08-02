@@ -93,8 +93,7 @@ export default function AdminExercisesPage() {
         </div>
       </div>
       <p className="mt-2 max-w-[68ch] text-sm text-ink-dim">
-        Compiler-free drills graded by matching the answer — these work with no Judge0
-        deployed, and they slot into the roadmap exactly like coding questions.
+        Compiler-free drills graded by matching the answer.
       </p>
 
       {/* authoring guide */}

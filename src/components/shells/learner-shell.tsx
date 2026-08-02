@@ -35,7 +35,7 @@ export function LearnerShell({ children }: { children: React.ReactNode }) {
       <div className="grid flex-1 md:grid-cols-[210px_1fr]">
         {/* sidebar */}
         <aside className="flex flex-row flex-wrap gap-1 border-b border-line bg-surface p-3 md:flex-col md:border-r md:border-b-0">
-          <span className="hidden px-2.5 pb-1.5 pt-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-ink-mute md:block">
+          <span className="hidden px-2.5 pb-1.5 pt-3 font-mono text-[10.5px] font-semibold uppercase tracking-[0.14em] text-tan md:block">
             Learn
           </span>
           <NavItem href="/dashboard" label="Dashboard" icon={<IconDashboard />} />

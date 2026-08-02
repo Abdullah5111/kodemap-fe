@@ -45,6 +45,12 @@ export const IconLogout = ({ className }: P) => (
 export const IconSearch = ({ className }: P) => (
   <svg className={s(className)} {...common}><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>
 );
+export const IconEye = ({ className }: P) => (
+  <svg className={s(className)} {...common}><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></svg>
+);
+export const IconEyeOff = ({ className }: P) => (
+  <svg className={s(className)} {...common}><path d="M10.7 5.1A10.6 10.6 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.3 4.2M6.6 6.6A17.6 17.6 0 0 0 2 12s3.5 7 10 7a10.6 10.6 0 0 0 4.2-.9M9.9 9.9a3 3 0 0 0 4.2 4.2M3 3l18 18" /></svg>
+);
 export const IconFlame = ({ className }: P) => (
   <svg className={s(className)} fill="currentColor" viewBox="0 0 24 24"><path d="M12 2c1 3-1 4-1 6a3 3 0 0 0 5 2c1 2 2 3 2 6a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 2 2 3 2 0-3-2-4-3-7z" /></svg>
 );

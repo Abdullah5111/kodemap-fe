@@ -181,8 +181,14 @@ export default function AdminDashboardPage() {
             <div className="rounded-2xl border border-line bg-surface p-5">
               <div className="flex items-center justify-between">
                 <h2 className="text-[15px] font-bold">Recent signups</h2>
-                <Link href="/admin/users" className="font-mono text-[11.5px] text-ink-mute hover:text-ember">
-                  all users →
+                <Link
+                  href="/admin/users"
+                  className="inline-flex items-center gap-1 rounded-lg border border-line-2 bg-elevated px-2.5 py-1.5 font-mono text-[11.5px] font-semibold text-ink-dim transition-colors hover:border-ember-line hover:bg-ember-soft hover:text-ember"
+                >
+                  All users
+                  <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
                 </Link>
               </div>
               <div className="mt-3 flex flex-col">
@@ -190,7 +196,7 @@ export default function AdminDashboardPage() {
                   <Link
                     key={u.id}
                     href={`/admin/users?focus=${u.id}`}
-                    className="flex items-center gap-3 border-b border-line py-2.5 last:border-b-0 hover:bg-ground"
+                    className="-mx-2 flex items-center gap-3 rounded-lg border-b border-line px-2 py-2.5 last:border-b-0 hover:bg-ground"
                   >
                     <Avatar name={u.full_name || u.username} className="size-8" />
                     <div className="min-w-0 flex-1">

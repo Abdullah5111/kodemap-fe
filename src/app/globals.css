@@ -23,18 +23,23 @@
   --ember-soft:  rgba(246, 95, 46, 0.14);
   --ember-line:  rgba(246, 95, 46, 0.38);
 
-  --tan:         #CBA47D;
-  --tan-soft:    rgba(203, 164, 125, 0.14);
+  /* Secondary brand accent = teal #257072. On the near-black dark theme the raw
+     brand teal is too dark to read, so dark mode uses a lighter tint of the same
+     hue; light mode below uses the exact brand teal. (Token is still named --tan
+     for historical reasons — it now carries the teal.) */
+  --tan:         #3FA39B;
+  --tan-soft:    rgba(63, 163, 155, 0.15);
 
   --ok:    #4CB98A; --ok-soft:   rgba(76, 185, 138, 0.14);
   --warn:  #E2A63E; --warn-soft: rgba(226, 166, 62, 0.14);
   --bad:   #E9564C; --bad-soft:  rgba(233, 86, 76, 0.14);
 
-  --d-vezy: #4CB98A;
-  --d-easy: #86BB4B;
-  --d-med:  #E2A63E;
-  --d-hard: #F65F2E;
-  --d-chal: #D6455B;
+  /* Difficulty reuses the brand + status palette — no new hues. */
+  --d-vezy: var(--ok);      /* very easy → green  */
+  --d-easy: var(--tan);     /* easy      → teal   */
+  --d-med:  var(--warn);    /* medium    → amber  */
+  --d-hard: var(--ember);   /* hard      → ember  */
+  --d-chal: var(--bad);     /* challenge → red    */
 
   --shadow: 0 1px 0 rgba(255, 255, 255, 0.02) inset, 0 8px 24px -12px rgba(0, 0, 0, 0.7);
 }
@@ -42,11 +47,11 @@
 @media (prefers-color-scheme: light) {
   :root:not([data-theme]) {
     color-scheme: light;
-    --ground:      #F1EADF;
-    --raise:       #EBE2D4;
+    --ground:      #F8F6F2;
+    --raise:       #F1ECE4;
     --surface:     #FFFFFF;
-    --elevated:    #F8F3EB;
-    --line:        #E7DBCA;
+    --elevated:    #F4EFE8;
+    --line:        #E7DDCE;
     --line-2:      #D8C8B2;
     --ink:         #241C13;
     --ink-dim:     #5C5142;
@@ -57,12 +62,12 @@
     --on-ember:    #FFFFFF;
     --ember-soft:  rgba(226, 78, 27, 0.10);
     --ember-line:  rgba(226, 78, 27, 0.30);
-    --tan:         #A9825B;
-    --tan-soft:    rgba(169, 130, 91, 0.14);
+    --tan:         #257072;   /* exact brand teal on the light ground */
+    --tan-soft:    rgba(37, 112, 114, 0.12);
     --ok:   #2E9E6E; --ok-soft:   rgba(46, 158, 110, 0.12);
     --warn: #B9821B; --warn-soft: rgba(185, 130, 27, 0.14);
     --bad:  #CF3E33; --bad-soft:  rgba(207, 62, 51, 0.12);
-    --d-vezy: #2E9E6E; --d-easy: #5E9A2A; --d-med: #B9821B; --d-hard: #E24E1B; --d-chal: #C13350;
+    --d-vezy: var(--ok); --d-easy: var(--tan); --d-med: var(--warn); --d-hard: var(--ember); --d-chal: var(--bad);
     --shadow: 0 1px 2px rgba(60, 40, 20, 0.04), 0 10px 26px -16px rgba(80, 50, 20, 0.28);
   }
 }
@@ -71,11 +76,11 @@
 
 :root[data-theme="light"] {
   color-scheme: light;
-  --ground:      #F1EADF;
-  --raise:       #EBE2D4;
+  --ground:      #F8F6F2;
+  --raise:       #F1ECE4;
   --surface:     #FFFFFF;
-  --elevated:    #F8F3EB;
-  --line:        #E7DBCA;
+  --elevated:    #F4EFE8;
+  --line:        #E7DDCE;
   --line-2:      #D8C8B2;
   --ink:         #241C13;
   --ink-dim:     #5C5142;
@@ -86,12 +91,12 @@
   --on-ember:    #FFFFFF;
   --ember-soft:  rgba(226, 78, 27, 0.10);
   --ember-line:  rgba(226, 78, 27, 0.30);
-  --tan:         #A9825B;
-  --tan-soft:    rgba(169, 130, 91, 0.14);
+  --tan:         #257072;   /* exact brand teal on the light ground */
+  --tan-soft:    rgba(37, 112, 114, 0.12);
   --ok:   #2E9E6E; --ok-soft:   rgba(46, 158, 110, 0.12);
   --warn: #B9821B; --warn-soft: rgba(185, 130, 27, 0.14);
   --bad:  #CF3E33; --bad-soft:  rgba(207, 62, 51, 0.12);
-  --d-vezy: #2E9E6E; --d-easy: #5E9A2A; --d-med: #B9821B; --d-hard: #E24E1B; --d-chal: #C13350;
+  --d-vezy: var(--ok); --d-easy: var(--tan); --d-med: var(--warn); --d-hard: var(--ember); --d-chal: var(--bad);
   --shadow: 0 1px 2px rgba(60, 40, 20, 0.04), 0 10px 26px -16px rgba(80, 50, 20, 0.28);
 }
 
@@ -144,12 +149,36 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Tailwind v4 no longer sets cursor:pointer on buttons by default — restore it
+   consistently for all enabled buttons and button-role controls. */
+button:not(:disabled),
+select:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+label[for],
+summary {
+  cursor: pointer;
+}
+button:disabled,
+select:disabled { cursor: not-allowed; }
+
 ::selection { background: var(--ember-soft); }
 
 :focus-visible {
   outline: 2px solid var(--ember);
   outline-offset: 2px;
   border-radius: 6px;
+}
+
+/* Text controls signal focus through their (ember) border, not an outline ring —
+   the ring around inputs/selects reads as a stray box. Keep the outline for
+   buttons, links and other controls where it's the only focus cue. */
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible {
+  outline: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -12,7 +12,7 @@ import { apiErrorMessage } from "@/lib/api";
 import { useAuth } from "@/components/auth-provider";
 import { homePathForRole } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/field";
+import { Field, Input, PasswordInput } from "@/components/ui/field";
 
 const schema = z.object({
   email: z.string().email("Enter a valid email."),
@@ -81,9 +81,8 @@ function LoginInner() {
         </Field>
 
         <Field label="Password" htmlFor="password" error={errors.password?.message}>
-          <Input
+          <PasswordInput
             id="password"
-            type="password"
             autoComplete="current-password"
             placeholder="••••••••"
             {...register("password")}

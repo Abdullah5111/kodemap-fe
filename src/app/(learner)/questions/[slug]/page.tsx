@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import { BackLink } from "@/components/ui/back-link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { solveApi, isTerminal, monacoLang, starterCode, type Submission } from "@/lib/solve";
@@ -93,9 +93,7 @@ export default function SolvePage() {
   if (error)
     return (
       <div>
-        <Link href="/roadmap" className="font-mono text-[12px] text-ink-mute hover:text-ember">
-          ← roadmap
-        </Link>
+        <BackLink href="/roadmap">Roadmap</BackLink>
         <div className="mt-4">
           <ErrorState message={apiErrorMessage(error)} onRetry={() => refetch()} />
         </div>
@@ -107,9 +105,7 @@ export default function SolvePage() {
 
   return (
     <div>
-      <Link href="/roadmap" className="font-mono text-[12px] text-ink-mute hover:text-ember">
-        ← roadmap
-      </Link>
+      <BackLink href="/roadmap">Roadmap</BackLink>
 
       {locked ? (
         <div className="mt-3 flex items-start gap-3 rounded-xl border border-line border-l-[3px] border-l-ink-mute bg-surface px-4 py-3">

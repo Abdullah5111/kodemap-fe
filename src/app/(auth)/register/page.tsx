@@ -9,7 +9,7 @@ import { z } from "zod";
 import { authApi, type RegisterPayload } from "@/lib/auth-api";
 import { apiErrorMessage } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/field";
+import { Field, Input, PasswordInput } from "@/components/ui/field";
 import { Select } from "@/components/ui/select";
 
 const EDUCATION_LEVELS = [
@@ -99,7 +99,7 @@ export default function RegisterPage() {
         </div>
 
         <Field label="Password" htmlFor="password" error={errors.password?.message} hint="At least 8 characters.">
-          <Input id="password" type="password" autoComplete="new-password" placeholder="••••••••" {...register("password")} />
+          <PasswordInput id="password" autoComplete="new-password" placeholder="••••••••" {...register("password")} />
         </Field>
 
         <div className="my-1 flex items-center gap-3 font-mono text-[11px] uppercase tracking-widest text-ink-mute">

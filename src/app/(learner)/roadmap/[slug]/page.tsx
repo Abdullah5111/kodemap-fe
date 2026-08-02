@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BackLink } from "@/components/ui/back-link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -153,9 +154,7 @@ export default function TrackTreePage() {
 
   return (
     <div>
-      <Link href="/roadmap" className="font-mono text-[12px] text-ink-mute hover:text-ember">
-        ← roadmap
-      </Link>
+      <BackLink href="/roadmap">Roadmap</BackLink>
 
       {isLoading ? (
         <Loading label="Loading track…" />

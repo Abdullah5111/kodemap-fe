@@ -9,7 +9,7 @@ import { z } from "zod";
 import { authApi } from "@/lib/auth-api";
 import { apiErrorMessage } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/field";
+import { Field, Input, PasswordInput } from "@/components/ui/field";
 import { OtpInput } from "@/components/ui/otp-input";
 
 const emailSchema = z.object({ email: z.string().email("Enter a valid email.") });
@@ -87,7 +87,7 @@ function ForgotInner() {
           </div>
           <form onSubmit={resetForm.handleSubmit(confirmReset)} className="mt-4 flex flex-col gap-4" noValidate>
             <Field label="New password" htmlFor="new_password" error={resetForm.formState.errors.new_password?.message} hint="At least 8 characters.">
-              <Input id="new_password" type="password" autoComplete="new-password" placeholder="••••••••" {...resetForm.register("new_password")} />
+              <PasswordInput id="new_password" autoComplete="new-password" placeholder="••••••••" {...resetForm.register("new_password")} />
             </Field>
             {error ? <p className="text-[13px] text-bad">{error}</p> : null}
             <Button type="submit" disabled={resetForm.formState.isSubmitting} className="w-full">

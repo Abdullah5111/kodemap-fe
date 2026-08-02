@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { LogoMark } from "./logo";
 
 export function Spinner({ className }: { className?: string }) {
   return (
@@ -13,11 +14,27 @@ export function Spinner({ className }: { className?: string }) {
   );
 }
 
+/** Branded loader: a two-tone (ember + teal) ring sweeping around the logo mark. */
+export function BrandLoader({ className }: { className?: string }) {
+  return (
+    <span
+      className={cn("relative grid size-16 place-items-center", className)}
+      role="status"
+      aria-label="Loading"
+    >
+      <span className="absolute inset-0 animate-spin rounded-full border-[2.5px] border-transparent border-t-ember border-b-tan [animation-duration:0.9s]" />
+      <LogoMark className="size-9" />
+    </span>
+  );
+}
+
 export function Loading({ label = "Loading…" }: { label?: string }) {
   return (
-    <div className="flex items-center gap-3 py-16 text-ink-mute">
-      <Spinner />
-      <span className="font-mono text-sm">{label}</span>
+    <div className="flex flex-col items-center justify-center gap-4 py-20">
+      <BrandLoader />
+      {label ? (
+        <span className="font-mono text-[13px] tracking-wide text-ink-mute">{label}</span>
+      ) : null}
     </div>
   );
 }

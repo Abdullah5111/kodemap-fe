@@ -1,39 +1,34 @@
 import { cn } from "@/lib/cn";
 
 /**
- * Placeholder brand mark + wordmark. Swap `LogoMark` for the real asset when
- * the brand files land — the rest of the app just imports <Logo />.
+ * Brand logo. Two assets live in /public:
+ *   - logo-mark.svg  → icon only (square)
+ *   - logo-full.svg  → icon + "Kodemap" wordmark
+ * Brand colors: ember #F65F2E + teal #257072.
  */
+
+/** Icon-only mark. Square; size via className (defaults to size-8). */
 export function LogoMark({ className }: { className?: string }) {
   return (
-    <span
-      className={cn(
-        "grid size-8 place-items-center rounded-[9px] border border-dashed border-line-2 bg-elevated text-ink-mute",
-        className,
-      )}
-      aria-hidden
-    >
-      <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2" />
-        <circle cx="8.5" cy="8.5" r="1.5" />
-        <path d="M21 15l-5-5L5 21" />
-      </svg>
-    </span>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/logo-mark.png"
+      alt="Kodemap"
+      className={cn("size-8 object-contain", className)}
+      draggable={false}
+    />
   );
 }
 
-export function Logo({ chip }: { chip?: string }) {
+/** Full lockup (icon + wordmark). Height via className (defaults to h-8). */
+export function Logo({ className }: { className?: string }) {
   return (
-    <span className="flex items-center gap-2.5">
-      <LogoMark />
-      <span className="font-mono text-lg font-bold tracking-tight">
-        kode<span className="text-ember">map</span>
-      </span>
-      {chip ? (
-        <span className="rounded-md border border-ember-line bg-ember-soft px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-ember">
-          {chip}
-        </span>
-      ) : null}
-    </span>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/logo-full.png"
+      alt="Kodemap"
+      className={cn("h-8 w-auto object-contain", className)}
+      draggable={false}
+    />
   );
 }

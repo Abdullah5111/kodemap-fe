@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useParams } from "next/navigation";
+import { BackLink } from "@/components/ui/back-link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { contentApi } from "@/lib/content";
 import { apiErrorMessage } from "@/lib/api";
@@ -25,9 +25,7 @@ export default function EditQuestionPage() {
 
   return (
     <div className="mx-auto max-w-[820px]">
-      <Link href="/admin/questions" className="font-mono text-[12px] text-ink-mute hover:text-ember">
-        ← question bank
-      </Link>
+      <BackLink href="/admin/questions">Question bank</BackLink>
 
       {isLoading ? (
         <Loading label="Loading question…" />

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { BackLink } from "@/components/ui/back-link";
 import { useRouter } from "next/navigation";
 import { QuestionForm } from "@/components/admin/question-form";
 
@@ -9,9 +9,7 @@ export default function NewQuestionPage() {
 
   return (
     <div className="mx-auto max-w-[820px]">
-      <Link href="/admin/questions" className="font-mono text-[12px] text-ink-mute hover:text-ember">
-        ← question bank
-      </Link>
+      <BackLink href="/admin/questions">Question bank</BackLink>
       <h1 className="mt-2 mb-4 text-[clamp(20px,3vw,25px)] font-bold tracking-tight">New question</h1>
       <QuestionForm
         mode="create"

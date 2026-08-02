@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -13,8 +13,11 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { Loading, ErrorState, EmptyState } from "@/components/ui/feedback";
+import { Pagination } from "@/components/ui/pagination";
 import { IconSearch, IconFlame } from "@/components/ui/icons";
 import { cn } from "@/lib/cn";
+
+const PAGE_SIZE = 20;
 
 function RolePill({ role }: { role: Role }) {
   return (
@@ -39,27 +42,41 @@ function UsersView() {
   const [active, setActive] = useState("");
   const [batch, setBatch] = useState("");
   const [ordering, setOrdering] = useState("-score");
-  const [focusId, setFocusId] = useState<number | null>(null);
+  const [page, setPage] = useState(1);
+
+  // Deep-link from the dashboard (?focus=<id>) — seed state from the URL and
+  // re-sync whenever the param changes (adjust-on-change during render).
+  const focusParam = searchParams.get("focus");
+  const paramFocusId = focusParam && /^\d+$/.test(focusParam) ? Number(focusParam) : null;
+  const [focusId, setFocusId] = useState<number | null>(paramFocusId);
+  const [prevFocusParam, setPrevFocusParam] = useState(focusParam);
+  if (focusParam !== prevFocusParam) {
+    setPrevFocusParam(focusParam);
+    if (paramFocusId != null) setFocusId(paramFocusId);
+  }
+
+  // Any filter/search/sort change resets to the first page. Done during render
+  // (React's "adjust state on change" pattern) rather than in an effect.
+  const filterKey = `${ordering}|${role}|${active}|${batch}|${search.trim()}`;
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
+    setPage(1);
+  }
 
   const { data: batches } = useQuery({
     queryKey: ["admin-batches"],
     queryFn: adminApi.batches,
   });
 
-  // deep-link from the dashboard (?focus=<id>)
-  useEffect(() => {
-    const f = searchParams.get("focus");
-    if (f && /^\d+$/.test(f)) setFocusId(Number(f));
-  }, [searchParams]);
-
-  const params: Record<string, string> = { ordering };
+  const params: Record<string, string> = { ordering, page: String(page) };
   if (search.trim()) params.search = search.trim();
   if (role) params.role = role;
   if (active) params.is_active = active;
   if (batch) params.batch = batch;
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["admin-users", ordering, role, active, batch, search.trim()],
+    queryKey: ["admin-users", ordering, role, active, batch, search.trim(), page],
     queryFn: () => adminApi.users(params),
   });
 
@@ -77,7 +94,7 @@ function UsersView() {
 
       {/* toolbar */}
       <div className="mt-4 flex flex-wrap items-center gap-2.5">
-        <div className="flex min-w-[220px] flex-1 items-center gap-2 rounded-[9px] border border-line bg-surface px-3 py-2 font-mono text-[13px] text-ink-mute">
+        <div className="flex min-w-[220px] flex-1 items-center gap-2 rounded-[9px] border border-line bg-surface px-3 py-2 font-mono text-[13px] text-ink-mute transition-colors focus-within:border-ember-line">
           <IconSearch className="size-[15px]" />
           <input
             value={search}
@@ -142,6 +159,10 @@ function UsersView() {
           </div>
         )}
       </div>
+
+      {data && !error ? (
+        <Pagination page={page} pageSize={PAGE_SIZE} count={data.count} onChange={setPage} />
+      ) : null}
 
       {focusId != null ? <UserDrawer id={focusId} onClose={() => setFocusId(null)} /> : null}
     </div>

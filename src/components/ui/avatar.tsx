@@ -11,7 +11,7 @@ export function Avatar({ name, className }: { name: string; className?: string }
   return (
     <span
       className={cn(
-        "grid size-[30px] place-items-center rounded-full bg-gradient-to-br from-tan to-ember font-mono text-[12px] font-bold text-[#1b0e06]",
+        "grid size-[30px] place-items-center rounded-full bg-ember font-mono text-[12px] font-bold text-on-ember",
         className,
       )}
     >

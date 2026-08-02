@@ -4,15 +4,12 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "./auth-provider";
 import { homePathForRole, type Role } from "@/lib/types";
-import { LogoMark } from "./ui/logo";
+import { BrandLoader } from "./ui/feedback";
 
 function Splash() {
   return (
     <div className="grid min-h-dvh place-items-center">
-      <div className="flex animate-pulse flex-col items-center gap-3 text-ink-mute">
-        <LogoMark className="size-11" />
-        <span className="font-mono text-sm">Loading…</span>
-      </div>
+      <BrandLoader />
     </div>
   );
 }
