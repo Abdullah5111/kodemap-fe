@@ -149,6 +149,10 @@ function MembersTab({ org, slug }: { org: OrgDetail; slug: string }) {
     mutationFn: (userId: number) => orgApi.removeMember(slug, userId),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["organization", slug] }),
   });
+  const transfer = useMutation({
+    mutationFn: (userId: number) => orgApi.transferOwnership(slug, userId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["organization", slug] }),
+  });
 
   const { data: pending } = useQuery({
     queryKey: ["org-invites", slug],
@@ -180,16 +184,33 @@ function MembersTab({ org, slug }: { org: OrgDetail; slug: string }) {
               {m.role}
             </span>
             {org.is_owner && m.role !== "owner" ? (
-              <button
-                type="button"
-                onClick={() => {
-                  if (confirm(`Remove ${m.username} from the organization?`))
-                    remove.mutate(m.user_id);
-                }}
-                className="font-mono text-[12px] text-ink-mute transition-colors hover:text-bad"
-              >
-                remove
-              </button>
+              <>
+                <button
+                  type="button"
+                  disabled={transfer.isPending}
+                  onClick={() => {
+                    if (
+                      confirm(
+                        `Make ${m.username} the owner? You'll become a regular member.`,
+                      )
+                    )
+                      transfer.mutate(m.user_id);
+                  }}
+                  className="font-mono text-[12px] text-ink-mute transition-colors hover:text-ember"
+                >
+                  make owner
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm(`Remove ${m.username} from the organization?`))
+                      remove.mutate(m.user_id);
+                  }}
+                  className="font-mono text-[12px] text-ink-mute transition-colors hover:text-bad"
+                >
+                  remove
+                </button>
+              </>
             ) : null}
           </div>
         ))}

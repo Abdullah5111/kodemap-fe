@@ -75,6 +75,8 @@ export const orgApi = {
   leave: (slug: string) => api.post(`/organizations/${slug}/leave`),
   removeMember: (slug: string, userId: number) =>
     api.delete(`/organizations/${slug}/members/${userId}`),
+  transferOwnership: (slug: string, userId: number) =>
+    api.post<OrgDetail>(`/organizations/${slug}/transfer`, { user_id: userId }).then((r) => r.data),
   leaderboard: (slug: string) =>
     api.get<OrgLeaderboard>(`/organizations/${slug}/leaderboard`).then((r) => r.data),
   searchUsers: (slug: string, q: string) =>
