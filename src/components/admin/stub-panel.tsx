@@ -15,7 +15,9 @@ const TEMPLATES: Record<string, { starter: string; harness: string }> = {
   python: {
     starter: "def solve(nums):\n    # Write your solution and return the result.\n    pass\n",
     harness:
-      'import sys, json\n_data = json.loads(sys.stdin.read() or "null")\n_args = _data if isinstance(_data, list) else [_data]\nprint(json.dumps(solve(*_args)))\n',
+      // separators=(",", ":") => compact JSON matching JS JSON.stringify, so the
+      // same expected_output works whether the learner picks Python or JS.
+      'import sys, json\n_data = json.loads(sys.stdin.read() or "null")\n_args = _data if isinstance(_data, list) else [_data]\nprint(json.dumps(solve(*_args), separators=(",", ":")))\n',
   },
   javascript: {
     starter: "function solve(nums) {\n  // Write your solution and return the result.\n}\n",

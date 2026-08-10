@@ -31,10 +31,24 @@ export default function SolvePage() {
   const [judging, setJudging] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
 
+  // Languages actually offered. For "complete the function" questions only
+  // languages that have a stub can run, so don't offer the others (submitting
+  // one would just error). Classic questions offer every allowed language.
+  const langs = useMemo(() => {
+    if (!q) return [];
+    if (q.io_mode !== "function") return q.allowed_languages;
+    const withStub = new Set((q.stubs ?? []).map((s) => s.language));
+    return q.allowed_languages.filter((l) => withStub.has(l.id));
+  }, [q]);
+
+  // A function question that has no stubs yet can't be solved in any language.
+  const funcUnready =
+    !!q && q.kind !== "exercise" && q.io_mode === "function" && langs.length === 0;
+
   // Pick a default language + seed its editor once the question loads. Done
   // during render (guarded by langId === null so it runs once), not in an effect.
-  if (q && langId === null && q.allowed_languages.length > 0) {
-    const first = q.allowed_languages[0];
+  if (q && langId === null && langs.length > 0) {
+    const first = langs[0];
     setLangId(first.id);
     setSources((s) => (s[first.id] !== undefined ? s : { ...s, [first.id]: initialSource(q, first) }));
   }
@@ -46,7 +60,7 @@ export default function SolvePage() {
   const source = langId != null ? sources[langId] ?? "" : "";
 
   function selectLang(id: number) {
-    const lang = q?.allowed_languages.find((l) => l.id === id);
+    const lang = langs.find((l) => l.id === id);
     setLangId(id);
     setSources((s) => ({
       ...s,
@@ -191,6 +205,19 @@ export default function SolvePage() {
             locked={locked}
             onSolved={() => void refetch()}
           />
+        ) : funcUnready ? (
+          <div className="flex items-start gap-3 rounded-2xl border border-line border-l-[3px] border-l-warn bg-surface px-4 py-4">
+            <svg viewBox="0 0 24 24" className="mt-0.5 size-[18px] shrink-0 text-warn" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+            </svg>
+            <div>
+              <p className="text-[14px] font-semibold">This question isn&apos;t ready yet</p>
+              <p className="text-[13px] text-ink-dim">
+                It&apos;s a complete-the-function question, but no language starter has been
+                set up for it. Please check back soon.
+              </p>
+            </div>
+          </div>
         ) : (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col overflow-hidden rounded-2xl border border-line bg-surface">
@@ -200,7 +227,7 @@ export default function SolvePage() {
                 onChange={(e) => selectLang(Number(e.target.value))}
                 className="rounded-md border border-line bg-ground px-2.5 py-1.5 font-mono text-[12.5px] text-ink outline-none"
               >
-                {q.allowed_languages.map((l) => (
+                {langs.map((l) => (
                   <option key={l.id} value={l.id}>
                     {l.name} {l.version}
                   </option>
