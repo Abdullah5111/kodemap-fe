@@ -203,6 +203,37 @@ export function monacoLang(name: string): string {
 }
 
 // A tiny starter template per language so the editor isn't empty.
+// --- editor draft persistence (per question + language) --------------------
+const DRAFT_PREFIX = "kodemap:draft:";
+const draftKey = (slug: string, langId: number) => `${DRAFT_PREFIX}${slug}:${langId}`;
+
+export function loadDraft(slug: string, langId: number): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(draftKey(slug, langId));
+  } catch {
+    return null;
+  }
+}
+
+export function saveDraft(slug: string, langId: number, code: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(draftKey(slug, langId), code);
+  } catch {
+    /* quota or disabled storage — drafting is best-effort */
+  }
+}
+
+export function clearDraft(slug: string, langId: number): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(draftKey(slug, langId));
+  } catch {
+    /* ignore */
+  }
+}
+
 /** Seed code for the editor: the question's per-language function stub when it's
     a "complete the function" question, otherwise the generic language starter. */
 export function initialSource(q: QuestionDetail, lang: Language): string {

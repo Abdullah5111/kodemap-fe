@@ -4,7 +4,16 @@ import { useMemo, useState } from "react";
 import { BackLink } from "@/components/ui/back-link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { solveApi, isTerminal, monacoLang, initialSource, type Submission } from "@/lib/solve";
+import {
+  solveApi,
+  isTerminal,
+  monacoLang,
+  initialSource,
+  loadDraft,
+  saveDraft,
+  clearDraft,
+  type Submission,
+} from "@/lib/solve";
 import { apiErrorMessage } from "@/lib/api";
 import { DifficultyBadge, Tag } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -50,7 +59,11 @@ export default function SolvePage() {
   if (q && langId === null && langs.length > 0) {
     const first = langs[0];
     setLangId(first.id);
-    setSources((s) => (s[first.id] !== undefined ? s : { ...s, [first.id]: initialSource(q, first) }));
+    setSources((s) =>
+      s[first.id] !== undefined
+        ? s
+        : { ...s, [first.id]: loadDraft(slug, first.id) ?? initialSource(q, first) },
+    );
   }
 
   const language = useMemo(
@@ -64,8 +77,24 @@ export default function SolvePage() {
     setLangId(id);
     setSources((s) => ({
       ...s,
-      [id]: s[id] ?? (q && lang ? initialSource(q, lang) : ""),
+      [id]: s[id] ?? (q && lang ? loadDraft(slug, id) ?? initialSource(q, lang) : ""),
     }));
+  }
+
+  // Persist the current editor buffer so a refresh or navigation keeps the work.
+  function updateSource(v: string) {
+    if (langId == null) return;
+    setSources((s) => ({ ...s, [langId]: v }));
+    saveDraft(slug, langId, v);
+  }
+
+  // Discard the saved draft and restore the language's starter code.
+  function resetToStarter() {
+    if (q == null || langId == null) return;
+    const lang = langs.find((l) => l.id === langId);
+    if (!lang) return;
+    clearDraft(slug, langId);
+    setSources((s) => ({ ...s, [langId]: initialSource(q, lang) }));
   }
 
   async function judge(mode: "run" | "submit") {
@@ -236,6 +265,14 @@ export default function SolvePage() {
               <span className="ml-auto font-mono text-[11px] text-ink-mute">
                 {language ? monacoLang(language.name) : ""}
               </span>
+              <button
+                type="button"
+                onClick={resetToStarter}
+                title="Discard your draft and restore the starter code"
+                className="font-mono text-[11px] text-ink-mute transition-colors hover:text-ember"
+              >
+                Reset
+              </button>
             </div>
 
             <div className="h-[320px] min-h-[260px]">
@@ -243,7 +280,7 @@ export default function SolvePage() {
                 <CodeEditor
                   language={monacoLang(language.name)}
                   value={source}
-                  onChange={(v) => langId != null && setSources((s) => ({ ...s, [langId]: v }))}
+                  onChange={updateSource}
                 />
               ) : null}
             </div>
