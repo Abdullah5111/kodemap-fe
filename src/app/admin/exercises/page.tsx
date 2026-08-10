@@ -16,7 +16,10 @@ import { Button } from "@/components/ui/button";
 import { Input, Textarea, Field } from "@/components/ui/field";
 import { Select } from "@/components/ui/select";
 import { Loading, ErrorState, EmptyState } from "@/components/ui/feedback";
+import { Pagination } from "@/components/ui/pagination";
 import { cn } from "@/lib/cn";
+
+const PAGE_SIZE = 20;
 
 const TYPE_META: Record<string, { label: string; cls: string }> = {
   predict_output: { label: "Predict output", cls: "text-d-vezy bg-d-vezy/12" },
@@ -37,10 +40,11 @@ export default function AdminExercisesPage() {
   const [result, setResult] = useState<ExerciseImportResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
+  const [page, setPage] = useState(1);
 
   const { data, isLoading, error: loadError, refetch } = useQuery({
-    queryKey: ["admin-exercises"],
-    queryFn: contentApi.listExercises,
+    queryKey: ["admin-exercises", page],
+    queryFn: () => contentApi.listExercises({ page }),
   });
 
   const importCsv = useMutation({
@@ -236,6 +240,10 @@ export default function AdminExercisesPage() {
             </table>
           </div>
         )}
+
+        {data && !loadError ? (
+          <Pagination page={page} pageSize={PAGE_SIZE} count={data.count} onChange={setPage} />
+        ) : null}
       </div>
 
       {showAdd ? (

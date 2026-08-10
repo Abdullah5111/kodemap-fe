@@ -264,8 +264,8 @@ export const contentApi = {
     api.patch<Testcase>(`/admin/testcases/${id}/`, payload).then((r) => r.data),
   deleteTestcase: (id: number) => api.delete(`/admin/testcases/${id}/`),
   // exercises (compiler-free)
-  listExercises: () =>
-    api.get<Paginated<ExerciseAdmin>>("/admin/exercises/").then((r) => r.data),
+  listExercises: (params: Record<string, string | number> = {}) =>
+    api.get<Paginated<ExerciseAdmin>>("/admin/exercises/", { params }).then((r) => r.data),
   // Author a single exercise (creates its backing Question + blanks server-side).
   authorExercise: (payload: ExerciseAuthorInput) =>
     api

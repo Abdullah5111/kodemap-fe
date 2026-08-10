@@ -29,9 +29,11 @@ function Dots({ passed, total, done }: { passed: number; total: number; done: bo
 export function ResultPanel({
   submission,
   judging,
+  functionMode = false,
 }: {
   submission: Submission | null;
   judging: boolean;
+  functionMode?: boolean;
 }) {
   if (!submission && !judging) {
     return (
@@ -81,9 +83,17 @@ export function ResultPanel({
       </div>
 
       {submission?.error_message ? (
-        <pre className="mx-4 mb-4 max-h-48 overflow-auto whitespace-pre-wrap rounded-lg border border-line bg-ground p-3 font-mono text-[12px] text-bad">
-          {submission.error_message}
-        </pre>
+        <div className="mx-4 mb-4">
+          {functionMode ? (
+            <p className="mb-1.5 font-mono text-[11px] text-ink-mute">
+              Note: a hidden test harness is appended after your code, so any line numbers past
+              the end of your function refer to it — not your solution.
+            </p>
+          ) : null}
+          <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded-lg border border-line bg-ground p-3 font-mono text-[12px] text-bad">
+            {submission.error_message}
+          </pre>
+        </div>
       ) : null}
 
       {/* per-sample detail (run only reveals I/O) */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -10,31 +10,37 @@ import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { DifficultyBadge, StatusDot } from "@/components/ui/badge";
 import { Loading, ErrorState, EmptyState } from "@/components/ui/feedback";
+import { Pagination } from "@/components/ui/pagination";
 import { IconSearch } from "@/components/ui/icons";
+
+const PAGE_SIZE = 20;
 
 export default function AdminQuestionsPage() {
   const router = useRouter();
   const [difficulty, setDifficulty] = useState("");
   const [status, setStatus] = useState("");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
-  const params: Record<string, string> = {};
+  // Reset to page 1 whenever a filter or the search changes (render-time adjust).
+  const filterKey = `${difficulty}|${status}|${search.trim()}`;
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
+    setPage(1);
+  }
+
+  const params: Record<string, string | number> = { page };
   if (difficulty) params.difficulty = difficulty;
   if (status) params.is_active = status;
+  if (search.trim()) params.search = search.trim();
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["admin-questions", difficulty, status],
+    queryKey: ["admin-questions", difficulty, status, search.trim(), page],
     queryFn: () => contentApi.listQuestions(params),
   });
 
-  const rows = useMemo(() => {
-    const list = data?.results ?? [];
-    if (!search.trim()) return list;
-    const q = search.trim().toLowerCase();
-    return list.filter(
-      (r) => r.title.toLowerCase().includes(q) || r.slug.toLowerCase().includes(q),
-    );
-  }, [data, search]);
+  const rows = data?.results ?? [];
 
   return (
     <div>
@@ -130,6 +136,10 @@ export default function AdminQuestionsPage() {
             </table>
           </div>
         )}
+
+        {data && !error ? (
+          <Pagination page={page} pageSize={PAGE_SIZE} count={data.count} onChange={setPage} />
+        ) : null}
       </div>
     </div>
   );

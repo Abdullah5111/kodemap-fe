@@ -276,7 +276,11 @@ export default function SolvePage() {
             </div>
           </div>
 
-          <ResultPanel submission={submission} judging={judging} />
+          <ResultPanel
+            submission={submission}
+            judging={judging}
+            functionMode={q.io_mode === "function"}
+          />
         </div>
         )}
       </div>

@@ -80,6 +80,29 @@ export function StubPanel({
       {isLoading ? (
         <Loading label="Loading stubs…" />
       ) : (
+        <>
+          {(() => {
+            const configuredIds = new Set(
+              (stubs ?? []).filter((s) => (s.harness || "").trim()).map((s) => s.language),
+            );
+            const missing = langs.filter((l) => !configuredIds.has(l.id));
+            if (langs.length === 0) return null;
+            if (missing.length === 0)
+              return (
+                <p className="mt-3 rounded-lg border border-ok/40 bg-ok-soft px-3 py-2 text-[12.5px] text-ok">
+                  All {langs.length} allowed language{langs.length === 1 ? "" : "s"} have a stub —
+                  learners can solve this in any of them.
+                </p>
+              );
+            return (
+              <p className="mt-3 rounded-lg border border-warn/40 bg-warn-soft px-3 py-2 text-[12.5px] text-warn">
+                No stub yet for {missing.map((l) => l.name).join(", ")} — learners can&apos;t
+                solve this question in {missing.length === 1 ? "that language" : "those languages"}.
+                Add {missing.length === 1 ? "it" : "them"} below or remove the language from the
+                question.
+              </p>
+            );
+          })()}
         <div className="mt-4 flex flex-col gap-3">
           {langs.map((l) => (
             <StubEditor
@@ -95,6 +118,7 @@ export function StubPanel({
             </p>
           ) : null}
         </div>
+        </>
       )}
     </div>
   );
