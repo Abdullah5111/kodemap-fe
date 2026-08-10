@@ -9,11 +9,13 @@ export function NavItem({
   label,
   icon,
   exact,
+  badge,
 }: {
   href: string;
   label: string;
   icon: React.ReactNode;
   exact?: boolean;
+  badge?: number;
 }) {
   const pathname = usePathname();
   const active = exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
@@ -30,6 +32,11 @@ export function NavItem({
     >
       <span className="[&>svg]:size-[17px]">{icon}</span>
       {label}
+      {badge ? (
+        <span className="ml-auto inline-flex min-w-[18px] items-center justify-center rounded-full bg-ember px-1.5 py-0.5 font-mono text-[10.5px] font-bold text-on-ember">
+          {badge > 99 ? "99+" : badge}
+        </span>
+      ) : null}
     </Link>
   );
 }

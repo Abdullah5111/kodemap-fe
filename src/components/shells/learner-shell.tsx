@@ -1,6 +1,8 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/components/auth-provider";
+import { orgApi } from "@/lib/orgs";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Avatar } from "@/components/ui/avatar";
@@ -10,12 +12,20 @@ import {
   IconRoadmap,
   IconTrophy,
   IconUser,
+  IconUsers,
   IconFlame,
+  IconList,
   IconLogout,
 } from "@/components/ui/icons";
 
 export function LearnerShell({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
+  const { data: inviteCount } = useQuery({
+    queryKey: ["my-invitations-count"],
+    queryFn: orgApi.myInvitationsCount,
+    enabled: !!user,
+    refetchInterval: 60_000,
+  });
   if (!user) return null;
 
   return (
@@ -41,6 +51,13 @@ export function LearnerShell({ children }: { children: React.ReactNode }) {
           <NavItem href="/dashboard" label="Dashboard" icon={<IconDashboard />} />
           <NavItem href="/roadmap" label="Roadmap" icon={<IconRoadmap />} />
           <NavItem href="/leaderboard" label="Leaderboard" icon={<IconTrophy />} />
+          <NavItem href="/organizations" label="Organizations" icon={<IconUsers />} />
+          <NavItem
+            href="/invitations"
+            label="Invitations"
+            icon={<IconList />}
+            badge={inviteCount}
+          />
           <NavItem href="/profile" label="Profile" icon={<IconUser />} />
           <div className="hidden flex-1 md:block" />
           <button
