@@ -14,7 +14,7 @@ export default function AdminTestcasesPage() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<QuestionListItem | null>(null);
 
-  const params: Record<string, string> = { kind: "coding" };
+  const params: Record<string, string> = { kind: "code" };
   if (search.trim()) params.search = search.trim();
 
   const { data, isLoading, error, refetch } = useQuery({
