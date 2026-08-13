@@ -21,6 +21,7 @@ export default function OrganizationDetailPage() {
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("members");
   const [showInvite, setShowInvite] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
 
   const { data: org, isLoading, error, refetch } = useQuery({
     queryKey: ["organization", slug],
@@ -85,17 +86,22 @@ export default function OrganizationDetailPage() {
             Invite
           </Button>
           {org.is_owner ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={del.isPending}
-              onClick={() => {
-                if (confirm("Delete this organization for everyone? This can't be undone."))
-                  del.mutate();
-              }}
-            >
-              Delete
-            </Button>
+            <>
+              <Button variant="ghost" size="sm" onClick={() => setShowEdit(true)}>
+                Edit
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={del.isPending}
+                onClick={() => {
+                  if (confirm("Delete this organization for everyone? This can't be undone."))
+                    del.mutate();
+                }}
+              >
+                Delete
+              </Button>
+            </>
           ) : (
             <Button
               variant="ghost"
@@ -139,6 +145,62 @@ export default function OrganizationDetailPage() {
       </div>
 
       {showInvite ? <InviteModal slug={slug} onClose={() => setShowInvite(false)} /> : null}
+      {showEdit ? <EditModal org={org} onClose={() => setShowEdit(false)} /> : null}
+    </div>
+  );
+}
+
+function EditModal({ org, onClose }: { org: OrgDetail; onClose: () => void }) {
+  const qc = useQueryClient();
+  const [name, setName] = useState(org.name);
+  const [description, setDescription] = useState(org.description);
+  const [err, setErr] = useState<string | null>(null);
+
+  const save = useMutation({
+    mutationFn: () => orgApi.update(org.slug, { name: name.trim(), description }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["organization", org.slug] });
+      qc.invalidateQueries({ queryKey: ["organizations"] });
+      onClose();
+    },
+    onError: (e) => setErr(apiErrorMessage(e, "Couldn't save changes.")),
+  });
+
+  return (
+    <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto p-4 sm:p-8">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden />
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (name.trim().length >= 2) save.mutate();
+        }}
+        className="relative z-10 w-full max-w-[480px] rounded-2xl border border-line bg-surface p-5 shadow-[var(--shadow)]"
+      >
+        <h2 className="text-[17px] font-bold">Edit organization</h2>
+        <label className="mt-4 block text-[12px] font-medium text-ink-dim">Name</label>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="mt-1 w-full rounded-[9px] border border-line bg-ground px-3 py-2 text-[14px] text-ink outline-none focus:border-ember-line"
+          autoFocus
+        />
+        <label className="mt-3 block text-[12px] font-medium text-ink-dim">Description</label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={3}
+          className="mt-1 w-full resize-none rounded-[9px] border border-line bg-ground px-3 py-2 text-[14px] text-ink outline-none focus:border-ember-line"
+        />
+        {err ? <p className="mt-2 text-[12.5px] text-bad">{err}</p> : null}
+        <div className="mt-4 flex justify-end gap-2">
+          <Button type="button" variant="ghost" size="sm" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" size="sm" disabled={save.isPending || name.trim().length < 2}>
+            Save
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }
@@ -152,6 +214,10 @@ function MembersTab({ org, slug }: { org: OrgDetail; slug: string }) {
   const transfer = useMutation({
     mutationFn: (userId: number) => orgApi.transferOwnership(slug, userId),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["organization", slug] }),
+  });
+  const cancelInvite = useMutation({
+    mutationFn: (id: number) => orgApi.cancelInvite(slug, id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["org-invites", slug] }),
   });
 
   const { data: pending } = useQuery({
@@ -235,6 +301,17 @@ function MembersTab({ org, slug }: { org: OrgDetail; slug: string }) {
                 {p.invited_by ? (
                   <span className="font-mono text-[11px] text-ink-mute">by {p.invited_by}</span>
                 ) : null}
+                <button
+                  type="button"
+                  disabled={cancelInvite.isPending}
+                  onClick={() => {
+                    if (confirm(`Cancel the invite to ${p.username}?`))
+                      cancelInvite.mutate(p.id);
+                  }}
+                  className="font-mono text-[11px] text-ink-mute transition-colors hover:text-bad"
+                >
+                  cancel
+                </button>
               </div>
             ))}
           </div>

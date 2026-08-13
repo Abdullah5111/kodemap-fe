@@ -71,7 +71,11 @@ export const orgApi = {
   create: (payload: { name: string; description?: string }) =>
     api.post<OrgDetail>("/organizations", payload).then((r) => r.data),
   detail: (slug: string) => api.get<OrgDetail>(`/organizations/${slug}`).then((r) => r.data),
+  update: (slug: string, payload: { name: string; description?: string }) =>
+    api.patch<OrgDetail>(`/organizations/${slug}`, payload).then((r) => r.data),
   remove: (slug: string) => api.delete(`/organizations/${slug}`),
+  cancelInvite: (slug: string, id: number) =>
+    api.delete(`/organizations/${slug}/invitations/${id}`),
   leave: (slug: string) => api.post(`/organizations/${slug}/leave`),
   removeMember: (slug: string, userId: number) =>
     api.delete(`/organizations/${slug}/members/${userId}`),
