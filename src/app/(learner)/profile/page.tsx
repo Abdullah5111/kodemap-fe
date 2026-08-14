@@ -161,11 +161,6 @@ export default function ProfilePage() {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-[18px] font-bold">{user.full_name || user.username}</h2>
-            {user.is_email_verified ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-ok-soft px-2 py-0.5 font-mono text-[10.5px] font-semibold text-ok">
-                <IconCheck className="size-[11px]" /> Verified
-              </span>
-            ) : null}
             {user.batch_name ? (
               <span className="rounded-full bg-tan-soft px-2 py-0.5 font-mono text-[10.5px] font-semibold text-tan">
                 {user.batch_name}
