@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orgApi, type MyInvitation } from "@/lib/orgs";
 import { apiErrorMessage } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
 import { Loading, ErrorState, EmptyState } from "@/components/ui/feedback";
 import { IconUsers } from "@/components/ui/icons";
 
@@ -18,10 +19,11 @@ export default function InvitationsPage() {
 
   return (
     <div>
-      <h1 className="text-[clamp(21px,3vw,27px)] font-bold tracking-tight">Invitations</h1>
-      <p className="mt-2 max-w-[60ch] text-sm text-ink-dim">
-        Organizations that have invited you. Accept to join and appear on their leaderboard.
-      </p>
+      <PageHeader
+        eyebrow="Learn / Invitations"
+        title="Invitations"
+        description="Organizations that have invited you. Accept to join and appear on their leaderboard."
+      />
 
       <div className="mt-5">
         {isLoading ? (

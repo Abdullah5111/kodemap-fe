@@ -64,9 +64,9 @@ export default function AdminSubmissionsPage() {
 
   return (
     <div>
-      <p className="font-mono text-[12px] text-ink-mute">admin / activity / submissions</p>
+      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ember">admin / activity / submissions</p>
       <div className="mt-1 flex flex-wrap items-end justify-between gap-3">
-        <h1 className="text-[clamp(20px,3vw,25px)] font-bold tracking-tight">Submissions monitor</h1>
+        <h1 className="text-[clamp(22px,3vw,28px)] font-extrabold tracking-tight">Submissions monitor</h1>
         <div className="flex items-center gap-2 font-mono text-[12px] text-ink-mute">
           <span className={cn("size-2 rounded-full", isFetching ? "bg-ok" : "bg-line-2")} />
           {data ? `${data.count} total` : "live"}

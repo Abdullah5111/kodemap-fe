@@ -24,9 +24,9 @@ export function NavItem({
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-3 rounded-[10px] border border-transparent px-3 py-2.5 text-sm font-medium transition-colors",
+        "flex items-center gap-3 rounded-[10px] border border-transparent px-3 py-2.5 text-sm font-medium transition-[box-shadow,background-color,color] duration-150",
         active
-          ? "border-ember-line bg-ember-soft text-ember"
+          ? "bg-brand-grad-btn text-white brand-glow-sm"
           : "text-ink-dim hover:bg-ground hover:text-ink",
       )}
     >

@@ -37,7 +37,7 @@ export default function EditQuestionPage() {
       ) : !data ? null : (
         <>
           <div className="mt-2 mb-4 flex flex-wrap items-center gap-3">
-            <h1 className="text-[clamp(20px,3vw,25px)] font-bold tracking-tight">{data.title}</h1>
+            <h1 className="text-[clamp(22px,3vw,28px)] font-extrabold tracking-tight">{data.title}</h1>
             <DifficultyBadge difficulty={data.difficulty} />
             <StatusDot active={data.is_active} label={data.is_active ? "Live" : "Draft"} />
             {saved ? <span className="font-mono text-[12px] text-ok">saved ✓</span> : null}

@@ -164,7 +164,7 @@ export default function TrackTreePage() {
         </div>
       ) : !data ? null : (
         <>
-          <h1 className="mt-2 text-[clamp(21px,3vw,27px)] font-bold tracking-tight">{data.title}</h1>
+          <h1 className="mt-2 text-[clamp(22px,3vw,28px)] font-extrabold tracking-tight">{data.title}</h1>
           <p className="mt-2 max-w-[65ch] text-sm text-ink-dim">{data.description}</p>
 
           {/* progress bar */}

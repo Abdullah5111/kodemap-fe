@@ -8,6 +8,7 @@ import { authApi } from "@/lib/auth-api";
 import { apiErrorMessage } from "@/lib/api";
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
 import { Field, Input, Textarea } from "@/components/ui/field";
 import { Select } from "@/components/ui/select";
 import { Avatar } from "@/components/ui/avatar";
@@ -122,8 +123,7 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-3xl">
-      <p className="font-mono text-[12px] text-ink-mute">learn / profile</p>
-      <h1 className="mt-1 text-[clamp(21px,3vw,27px)] font-bold tracking-tight">Your profile</h1>
+      <PageHeader eyebrow="Learn / Profile" title="Your profile" />
 
       {/* identity card */}
       <div className="mt-5 flex flex-col gap-4 rounded-2xl border border-line bg-surface p-5 sm:flex-row sm:items-center">

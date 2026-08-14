@@ -23,6 +23,20 @@
   --ember-soft:  rgba(246, 95, 46, 0.14);
   --ember-line:  rgba(246, 95, 46, 0.38);
 
+  /* Brand gradient: ember #F65F2E → deep maroon #722525. The signature surface
+     treatment — reads on both the near-black and the light ground. */
+  --grad-from:   #F65F2E;
+  --grad-to:     #722525;
+  --brand-grad:  linear-gradient(135deg, var(--grad-from) 0%, var(--grad-to) 100%);
+  /* Deeper variant for solid controls, so white label text stays legible across
+     the whole button (the raw bright ember end fails contrast with white). */
+  --brand-grad-btn: linear-gradient(135deg, #E24E1B 0%, #6B2020 100%);
+  --brand-grad-soft: linear-gradient(135deg, rgba(246, 95, 46, 0.16), rgba(114, 37, 37, 0.16));
+  --brand-glow:  0 12px 34px -12px rgba(246, 95, 46, 0.5);
+  --brand-glow-sm: 0 6px 18px -8px rgba(246, 95, 46, 0.45);
+  /* Soft radial aura for hero/section backgrounds. */
+  --brand-aura:  radial-gradient(120% 120% at 0% 0%, rgba(246, 95, 46, 0.16) 0%, rgba(114, 37, 37, 0.06) 40%, transparent 70%);
+
   /* Secondary brand accent = teal #257072. On the near-black dark theme the raw
      brand teal is too dark to read, so dark mode uses a lighter tint of the same
      hue; light mode below uses the exact brand teal. (Token is still named --tan
@@ -160,6 +174,28 @@ summary {
 }
 button:disabled,
 select:disabled { cursor: not-allowed; }
+
+/* ---- Brand gradient utilities ----------------------------------------- */
+.bg-brand-grad      { background-image: var(--brand-grad); }
+.bg-brand-grad-btn  { background-image: var(--brand-grad-btn); }
+.bg-brand-grad-soft { background-image: var(--brand-grad-soft); }
+.bg-brand-aura      { background-image: var(--brand-aura); }
+.text-brand-grad {
+  background: var(--brand-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.brand-glow    { box-shadow: var(--brand-glow); }
+.brand-glow-sm { box-shadow: var(--brand-glow-sm); }
+/* Gradient hairline border via padding-box/border-box mask. */
+.brand-grad-border {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    var(--brand-grad) border-box;
+}
 
 ::selection { background: var(--ember-soft); }
 

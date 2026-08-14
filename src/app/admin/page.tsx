@@ -117,8 +117,8 @@ export default function AdminDashboardPage() {
 
   return (
     <div>
-      <p className="font-mono text-[12px] text-ink-mute">admin / overview</p>
-      <h1 className="mt-1 text-[clamp(20px,3vw,25px)] font-bold tracking-tight">Platform overview</h1>
+      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ember">admin / overview</p>
+      <h1 className="mt-1 text-[clamp(22px,3vw,28px)] font-extrabold tracking-tight">Platform overview</h1>
 
       {isLoading ? (
         <Loading label="Loading platform stats…" />

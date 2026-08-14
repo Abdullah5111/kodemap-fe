@@ -29,9 +29,9 @@ export default function AdminBatchesPage() {
 
   return (
     <div>
-      <p className="font-mono text-[12px] text-ink-mute">admin / people / batches</p>
+      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ember">admin / people / batches</p>
       <div className="mt-1 flex flex-wrap items-end justify-between gap-3">
-        <h1 className="text-[clamp(20px,3vw,25px)] font-bold tracking-tight">Batches</h1>
+        <h1 className="text-[clamp(22px,3vw,28px)] font-extrabold tracking-tight">Batches</h1>
         <Button size="sm" onClick={() => setEditing("new")}>
           <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
             <path d="M12 5v14M5 12h14" />

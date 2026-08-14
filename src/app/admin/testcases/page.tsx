@@ -26,9 +26,9 @@ export default function AdminTestcasesPage() {
 
   return (
     <div>
-      <p className="font-mono text-[12px] text-ink-mute">admin / content / test cases</p>
+      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ember">admin / content / test cases</p>
       <div className="mt-1 flex flex-wrap items-end justify-between gap-3">
-        <h1 className="text-[clamp(20px,3vw,25px)] font-bold tracking-tight">Test cases</h1>
+        <h1 className="text-[clamp(22px,3vw,28px)] font-extrabold tracking-tight">Test cases</h1>
         {data ? (
           <span className="font-mono text-[12px] text-ink-mute">{data.count} coding questions</span>
         ) : null}

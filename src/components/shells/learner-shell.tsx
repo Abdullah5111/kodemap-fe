@@ -34,7 +34,7 @@ export function LearnerShell({ children }: { children: React.ReactNode }) {
       <header className="flex items-center gap-3 border-b border-line bg-surface px-4 py-3">
         <Logo />
         <div className="flex-1" />
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-ember-line bg-ember-soft px-3 py-1.5 font-mono text-[13px] text-ember">
+        <span className="bg-brand-grad brand-glow-sm inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[13px] font-semibold text-white">
           <IconFlame className="size-[15px]" />
           {user.streak_count}
         </span>

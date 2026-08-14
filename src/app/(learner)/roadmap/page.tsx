@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { contentApi, type TrackCategory } from "@/lib/content";
 import { apiErrorMessage } from "@/lib/api";
 import { Loading, ErrorState, EmptyState } from "@/components/ui/feedback";
+import { PageHeader } from "@/components/ui/page-header";
 import { IconRoadmap } from "@/components/ui/icons";
 
 const CATEGORY_LABEL: Record<TrackCategory, string> = {
@@ -21,12 +22,11 @@ export default function RoadmapPage() {
 
   return (
     <div>
-      <p className="font-mono text-[12px] text-ink-mute">learn / roadmap</p>
-      <h1 className="mt-1 text-[clamp(21px,3vw,27px)] font-bold tracking-tight">Choose your track</h1>
-      <p className="mt-2 max-w-[60ch] text-sm text-ink-dim">
-        Each track is a guided path — modules break into lessons, and every lesson has must-do
-        questions. Pick where you are and follow the roadmap.
-      </p>
+      <PageHeader
+        eyebrow="Learn / Roadmap"
+        title="Choose your track"
+        description="Each track is a guided path — modules break into lessons, and every lesson has must-do questions. Pick where you are and follow the roadmap."
+      />
 
       <div className="mt-6">
         {isLoading ? (

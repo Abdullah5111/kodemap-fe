@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { statsApi, type LeaderboardEntry } from "@/lib/stats";
 import { apiErrorMessage } from "@/lib/api";
 import { Avatar } from "@/components/ui/avatar";
+import { PageHeader } from "@/components/ui/page-header";
 import { Loading, ErrorState, EmptyState } from "@/components/ui/feedback";
 import { IconFlame } from "@/components/ui/icons";
 import { cn } from "@/lib/cn";
@@ -68,11 +69,11 @@ export default function LeaderboardPage() {
 
   return (
     <div>
-      <h1 className="text-[clamp(21px,3vw,27px)] font-bold tracking-tight">Leaderboard</h1>
-      <p className="mt-2 max-w-[60ch] text-sm text-ink-dim">
-        Points come from first-accepted solutions; ties break on who reached the score first.
-        Keep a daily streak going to stay warm.
-      </p>
+      <PageHeader
+        eyebrow="Learn / Leaderboard"
+        title="Leaderboard"
+        description="Points come from first-accepted solutions; ties break on who reached the score first. Keep a daily streak going to stay warm."
+      />
 
       <div className="mt-5 flex gap-1.5">
         {TABS.map((t) => (

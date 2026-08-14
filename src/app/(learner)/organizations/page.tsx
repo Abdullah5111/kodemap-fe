@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orgApi, type OrgSummary } from "@/lib/orgs";
 import { apiErrorMessage } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
 import { Field, Input, Textarea } from "@/components/ui/field";
 import { Loading, ErrorState, EmptyState } from "@/components/ui/feedback";
 import { IconUsers } from "@/components/ui/icons";
@@ -22,21 +23,19 @@ export default function OrganizationsPage() {
 
   return (
     <div>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[clamp(21px,3vw,27px)] font-bold tracking-tight">Organizations</h1>
-          <p className="mt-2 max-w-[60ch] text-sm text-ink-dim">
-            Create a group, invite people by username or email, and compete on your own
-            leaderboard.
-          </p>
-        </div>
-        <Button size="sm" onClick={() => setShowCreate(true)}>
-          <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          New organization
-        </Button>
-      </div>
+      <PageHeader
+        eyebrow="Learn / Organizations"
+        title="Organizations"
+        description="Create a group, invite people by username or email, and compete on your own leaderboard."
+        actions={
+          <Button size="sm" onClick={() => setShowCreate(true)}>
+            <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            New organization
+          </Button>
+        }
+      />
 
       <div className="mt-5">
         {isLoading ? (

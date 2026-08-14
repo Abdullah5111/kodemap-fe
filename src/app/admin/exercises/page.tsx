@@ -76,9 +76,9 @@ export default function AdminExercisesPage() {
 
   return (
     <div>
-      <p className="font-mono text-[12px] text-ink-mute">admin / content / exercises</p>
+      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ember">admin / content / exercises</p>
       <div className="mt-1 flex flex-wrap items-end justify-between gap-3">
-        <h1 className="text-[clamp(20px,3vw,25px)] font-bold tracking-tight">Exercises</h1>
+        <h1 className="text-[clamp(22px,3vw,28px)] font-extrabold tracking-tight">Exercises</h1>
         <div className="flex flex-wrap gap-2">
           <Button variant="ghost" size="sm" onClick={downloadTemplate}>
             CSV template

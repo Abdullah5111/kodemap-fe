@@ -17,26 +17,37 @@ import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/ui/badge";
 import { Loading, ErrorState, EmptyState } from "@/components/ui/feedback";
+import { LogoMark } from "@/components/ui/logo";
+import { SectionTitle } from "@/components/ui/page-header";
 import { IconFlame } from "@/components/ui/icons";
 
 function StatTile({
   label,
   value,
-  accent,
+  hero,
   icon,
 }: {
   label: string;
   value: string;
-  accent?: boolean;
+  hero?: boolean;
   icon?: React.ReactNode;
 }) {
+  if (hero) {
+    return (
+      <div className="bg-brand-grad brand-glow-sm relative overflow-hidden rounded-2xl p-4 text-white">
+        <div className="font-mono text-[10.5px] uppercase tracking-wider text-white/70">{label}</div>
+        <div className="mt-1.5 flex items-center gap-2">
+          <span className="text-[30px] font-extrabold tabular-nums drop-shadow-sm">{value}</span>
+          {icon}
+        </div>
+      </div>
+    );
+  }
   return (
-    <div className="rounded-2xl border border-line bg-surface p-4">
+    <div className="rounded-2xl border border-line bg-surface p-4 transition-[transform,box-shadow,border-color] duration-150 hover:-translate-y-0.5 hover:border-line-2 hover:shadow-[var(--shadow)]">
       <div className="font-mono text-[10.5px] uppercase tracking-wider text-ink-mute">{label}</div>
       <div className="mt-1.5 flex items-center gap-2">
-        <span className={`text-[26px] font-bold tabular-nums ${accent ? "text-ember" : ""}`}>
-          {value}
-        </span>
+        <span className="text-[30px] font-extrabold tabular-nums">{value}</span>
         {icon}
       </div>
     </div>
@@ -52,10 +63,34 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <p className="font-mono text-[12px] text-ink-mute">learn / dashboard</p>
-      <h1 className="mt-1 text-[clamp(21px,3vw,27px)] font-bold tracking-tight">
-        Welcome back{user ? `, ${user.username}` : ""}
-      </h1>
+      {/* hero */}
+      <div className="relative overflow-hidden rounded-3xl border border-line bg-surface px-6 py-7 sm:px-8 sm:py-8">
+        <div className="bg-brand-aura pointer-events-none absolute inset-0" aria-hidden />
+        <LogoMark
+          className="pointer-events-none absolute -right-6 -top-6 size-40 opacity-[0.06] blur-[1px]"
+          aria-hidden
+        />
+        <div className="relative flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ember">
+              Learn / Dashboard
+            </p>
+            <h1 className="mt-2 text-[clamp(26px,4vw,38px)] font-extrabold leading-[1.05] tracking-tight">
+              Welcome back{user ? <>, <span className="text-brand-grad">{user.username}</span></> : ""}
+            </h1>
+            <p className="mt-2 max-w-[46ch] text-[14px] text-ink-dim">
+              Keep building momentum — every solved problem moves you up the map.
+            </p>
+          </div>
+          {user ? (
+            <span className="bg-brand-grad brand-glow-sm inline-flex items-center gap-2 rounded-full px-4 py-2 font-mono text-[15px] font-bold text-white">
+              <IconFlame className="size-[18px]" />
+              {user.streak_count}
+              <span className="text-[11px] font-medium text-white/70">day streak</span>
+            </span>
+          ) : null}
+        </div>
+      </div>
 
       {isLoading ? (
         <Loading label="Loading your stats…" />
@@ -66,21 +101,21 @@ export default function DashboardPage() {
       ) : !data ? null : (
         <>
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatTile label="Score" value={data.score.toLocaleString()} accent />
+            <StatTile label="Score" value={data.score.toLocaleString()} hero />
             <StatTile label="Solved" value={String(data.solved)} />
             <StatTile label="Rank" value={data.rank ? `#${data.rank}` : "—"} />
             <StatTile
               label="Streak"
               value={String(data.streak)}
-              icon={<IconFlame className="size-5 text-ember" />}
+              icon={<IconFlame className="size-6 text-ember" />}
             />
           </div>
 
           <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_1.2fr]">
             {/* solved by difficulty */}
-            <div className="rounded-2xl border border-line bg-surface p-5">
-              <h2 className="text-[15px] font-bold">Solved by difficulty</h2>
-              <div className="mt-3 flex flex-col gap-2.5">
+            <div className="rounded-2xl border border-line bg-surface p-5 shadow-[var(--shadow)] sm:p-6">
+              <SectionTitle>Solved by difficulty</SectionTitle>
+              <div className="mt-4 flex flex-col gap-3">
                 {DIFFICULTY_ORDER.map((d) => {
                   const count = data.by_difficulty[d] ?? 0;
                   const meta = DIFFICULTY_META[d];
@@ -89,9 +124,9 @@ export default function DashboardPage() {
                       <span className="w-24 font-mono text-[12px]" style={{ color: `var(--d-${D_VAR[d]})` }}>
                         {meta.label}
                       </span>
-                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-elevated">
+                      <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-elevated">
                         <div
-                          className="h-full rounded-full"
+                          className="h-full rounded-full transition-[width] duration-500"
                           style={{
                             width: `${Math.min(100, count * 20)}%`,
                             background: `var(--d-${D_VAR[d]})`,
@@ -105,15 +140,15 @@ export default function DashboardPage() {
                   );
                 })}
               </div>
-              <div className="mt-4 border-t border-line pt-3 font-mono text-[12px] text-ink-mute">
+              <div className="mt-5 border-t border-line pt-3 font-mono text-[12px] text-ink-mute">
                 {data.accepted_count} accepted · {data.submissions_total} submissions ·{" "}
                 {data.attempted} attempted
               </div>
             </div>
 
             {/* recent submissions */}
-            <div className="rounded-2xl border border-line bg-surface p-5">
-              <h2 className="text-[15px] font-bold">Recent activity</h2>
+            <div className="rounded-2xl border border-line bg-surface p-5 shadow-[var(--shadow)] sm:p-6">
+              <SectionTitle>Recent activity</SectionTitle>
               {data.recent_submissions.length === 0 ? (
                 <div className="mt-3">
                   <EmptyState
@@ -132,9 +167,11 @@ export default function DashboardPage() {
                     <Link
                       key={s.id}
                       href={`/questions/${s.question_slug}`}
-                      className="flex items-center gap-3 border-b border-line py-2.5 last:border-b-0 hover:text-ember"
+                      className="group flex items-center gap-3 border-b border-line py-2.5 last:border-b-0"
                     >
-                      <span className="flex-1 truncate text-[13.5px]">{s.question_title}</span>
+                      <span className="flex-1 truncate text-[13.5px] transition-colors group-hover:text-ember">
+                        {s.question_title}
+                      </span>
                       <span className="font-mono text-[11px] text-ink-mute">{s.mode}</span>
                       <StatusPill status={s.status} />
                       <span className="w-16 text-right font-mono text-[11px] text-ink-mute">
@@ -147,13 +184,21 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="mt-4 flex items-center justify-between rounded-2xl border border-line border-l-[3px] border-l-ember bg-surface px-5 py-4">
-            <div>
-              <p className="text-[14px] font-semibold">Keep the streak alive</p>
-              <p className="text-[13px] text-ink-dim">Solve today&apos;s next must-do question.</p>
+          {/* CTA banner */}
+          <div className="bg-brand-grad brand-glow relative mt-4 flex flex-wrap items-center justify-between gap-4 overflow-hidden rounded-2xl px-6 py-5 text-white sm:px-7">
+            <LogoMark
+              className="pointer-events-none absolute -right-4 -bottom-8 size-36 opacity-10"
+              variant="white"
+              aria-hidden
+            />
+            <div className="relative">
+              <p className="text-[16px] font-bold">Keep the streak alive</p>
+              <p className="text-[13.5px] text-white/80">Solve today&apos;s next must-do question.</p>
             </div>
-            <Link href="/roadmap">
-              <Button size="sm">Continue roadmap</Button>
+            <Link href="/roadmap" className="relative">
+              <span className="inline-flex items-center justify-center rounded-[10px] bg-white px-4 py-2.5 text-sm font-bold text-[#722525] transition-transform hover:-translate-y-px">
+                Continue roadmap
+              </span>
             </Link>
           </div>
         </>
