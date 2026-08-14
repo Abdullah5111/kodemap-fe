@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import { useAuth } from "@/components/auth-provider";
 import { orgApi } from "@/lib/orgs";
 import { Logo } from "@/components/ui/logo";
@@ -11,7 +12,6 @@ import {
   IconDashboard,
   IconRoadmap,
   IconTrophy,
-  IconUser,
   IconUsers,
   IconFlame,
   IconList,
@@ -39,7 +39,14 @@ export function LearnerShell({ children }: { children: React.ReactNode }) {
           {user.streak_count}
         </span>
         <ThemeToggle />
-        <Avatar name={user.full_name || user.username} />
+        <Link
+          href="/profile"
+          title="Your profile"
+          aria-label="Your profile"
+          className="rounded-full outline-offset-2 transition-[box-shadow] hover:shadow-[0_0_0_2px_var(--ember-line)]"
+        >
+          <Avatar name={user.full_name || user.username} />
+        </Link>
       </header>
 
       <div className="grid flex-1 md:grid-cols-[210px_1fr]">
@@ -58,7 +65,6 @@ export function LearnerShell({ children }: { children: React.ReactNode }) {
             icon={<IconList />}
             badge={inviteCount}
           />
-          <NavItem href="/profile" label="Profile" icon={<IconUser />} />
           <div className="hidden flex-1 md:block" />
           <button
             type="button"

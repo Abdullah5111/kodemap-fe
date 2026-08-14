@@ -32,6 +32,12 @@ function forceLogout() {
 api.interceptors.request.use((cfg: InternalAxiosRequestConfig) => {
   const access = tokens.access;
   if (access) cfg.headers.Authorization = `Bearer ${access}`;
+  // For file uploads (FormData) drop the instance-default application/json so the
+  // browser sets multipart/form-data with the correct boundary — otherwise the
+  // server can't parse the file ("The submitted data was not a file").
+  if (typeof FormData !== "undefined" && cfg.data instanceof FormData) {
+    cfg.headers.delete("Content-Type");
+  }
   return cfg;
 });
 
