@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { BackLink } from "@/components/ui/back-link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +13,8 @@ import {
   loadDraft,
   saveDraft,
   clearDraft,
+  loadLangPref,
+  saveLangPref,
   type Submission,
 } from "@/lib/solve";
 import { apiErrorMessage } from "@/lib/api";
@@ -54,10 +57,12 @@ export default function SolvePage() {
   const funcUnready =
     !!q && q.kind !== "exercise" && q.io_mode === "function" && langs.length === 0;
 
-  // Pick a default language + seed its editor once the question loads. Done
-  // during render (guarded by langId === null so it runs once), not in an effect.
+  // Pick a default language + seed its editor once the question loads. Prefer the
+  // language the learner last chose (across problems), falling back to the first.
+  // Done during render (guarded by langId === null so it runs once), not in an effect.
   if (q && langId === null && langs.length > 0) {
-    const first = langs[0];
+    const pref = loadLangPref();
+    const first = langs.find((l) => l.id === pref) ?? langs[0];
     setLangId(first.id);
     setSources((s) =>
       s[first.id] !== undefined
@@ -75,6 +80,7 @@ export default function SolvePage() {
   function selectLang(id: number) {
     const lang = langs.find((l) => l.id === id);
     setLangId(id);
+    saveLangPref(id);
     setSources((s) => ({
       ...s,
       [id]: s[id] ?? (q && lang ? loadDraft(slug, id) ?? initialSource(q, lang) : ""),
@@ -82,10 +88,16 @@ export default function SolvePage() {
   }
 
   // Persist the current editor buffer so a refresh or navigation keeps the work.
+  // Editing invalidates any shown verdict, so clear it — a stale "Failed" next to
+  // freshly-changed code is confusing.
   function updateSource(v: string) {
     if (langId == null) return;
     setSources((s) => ({ ...s, [langId]: v }));
     saveDraft(slug, langId, v);
+    if (submission || runError) {
+      setSubmission(null);
+      setRunError(null);
+    }
   }
 
   // Discard the saved draft and restore the language's starter code.
@@ -165,6 +177,30 @@ export default function SolvePage() {
         </div>
       ) : null}
 
+      {q.is_solved ? (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-ok/40 bg-ok-soft px-4 py-3">
+          <div className="flex items-center gap-2.5">
+            <span className="grid size-7 shrink-0 place-items-center rounded-full bg-ok text-white">
+              <IconCheck className="size-[16px]" />
+            </span>
+            <div>
+              <p className="text-[15px] font-bold text-ok">Solved</p>
+              <p className="text-[12.5px] text-ink-dim">Nice work — this problem is complete.</p>
+            </div>
+          </div>
+          {q.next_slug ? (
+            <Link href={`/questions/${q.next_slug}`}>
+              <Button size="sm">
+                Next problem
+                <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </Button>
+            </Link>
+          ) : null}
+        </div>
+      ) : null}
+
       <div className="mt-3 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
         {/* problem statement */}
         <div className="rounded-2xl border border-line bg-surface p-5">
@@ -216,8 +252,14 @@ export default function SolvePage() {
               <div className="flex flex-col gap-2.5">
                 {q.sample_testcases.map((c, i) => (
                   <div key={c.id} className="grid gap-2 sm:grid-cols-2">
-                    <SampleBox label={`input ${i + 1}`} value={c.input} />
-                    <SampleBox label="expected" value={c.expected_output} />
+                    <SampleBox
+                      label={q.io_mode === "function" ? "arguments" : `input ${i + 1}`}
+                      value={q.io_mode === "function" ? formatArgs(c.input) : c.input}
+                    />
+                    <SampleBox
+                      label={q.io_mode === "function" ? "returns" : "expected"}
+                      value={c.expected_output}
+                    />
                   </div>
                 ))}
               </div>
@@ -323,6 +365,18 @@ export default function SolvePage() {
       </div>
     </div>
   );
+}
+
+// Function-mode inputs are a JSON array of the call arguments (e.g. "[3, 7, 5]" or
+// "[[1,2,3], 9]"). Render them as a readable argument list rather than raw JSON.
+function formatArgs(input: string): string {
+  try {
+    const parsed = JSON.parse(input);
+    if (Array.isArray(parsed)) return parsed.map((a) => JSON.stringify(a)).join(", ");
+  } catch {
+    /* not JSON — show as-is */
+  }
+  return input;
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {

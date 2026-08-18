@@ -75,6 +75,8 @@ export interface QuestionDetail {
   exercise: ExerciseDetail | null;
   /** Present only for "complete the function" (io_mode === "function") questions. */
   stubs: CodeStub[];
+  /** Slug of the next question in roadmap order, or null if this is the last. */
+  next_slug: string | null;
 }
 
 export type SubmissionStatus =
@@ -231,6 +233,28 @@ export function clearDraft(slug: string, langId: number): void {
     window.localStorage.removeItem(draftKey(slug, langId));
   } catch {
     /* ignore */
+  }
+}
+
+// --- last chosen language (remembered across problems) ---------------------
+const LANG_PREF_KEY = "kodemap:lang";
+
+export function loadLangPref(): number | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const v = window.localStorage.getItem(LANG_PREF_KEY);
+    return v ? Number(v) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveLangPref(langId: number): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(LANG_PREF_KEY, String(langId));
+  } catch {
+    /* best-effort */
   }
 }
 
