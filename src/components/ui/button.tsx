@@ -1,6 +1,6 @@
 import { cn } from "@/lib/cn";
 
-type Variant = "primary" | "ghost" | "quiet";
+type Variant = "primary" | "ghost" | "quiet" | "danger";
 type Size = "md" | "sm";
 
 const base =
@@ -10,6 +10,7 @@ const variants: Record<Variant, string> = {
   primary: "bg-brand-grad-btn text-white brand-glow-sm hover:brightness-110",
   ghost: "bg-elevated text-ink border border-line-2 hover:bg-raise hover:border-tan hover:text-tan",
   quiet: "bg-transparent text-ink-dim border border-line hover:bg-elevated hover:text-ink hover:border-line-2",
+  danger: "bg-bad text-white shadow-[0_6px_18px_-8px_rgba(233,86,76,0.5)] hover:brightness-110",
 };
 
 const sizes: Record<Size, string> = {

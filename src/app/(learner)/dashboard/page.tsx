@@ -76,7 +76,7 @@ export default function DashboardPage() {
               Learn / Dashboard
             </p>
             <h1 className="mt-2 text-[clamp(26px,4vw,38px)] font-extrabold leading-[1.05] tracking-tight">
-              Welcome back{user ? <>, <span className="text-brand-grad">{user.username}</span></> : ""}
+              Welcome back{user ? <>, <span className="text-brand-grad">{user.full_name || user.username}</span></> : ""}
             </h1>
             <p className="mt-2 max-w-[46ch] text-[14px] text-ink-dim">
               Keep building momentum — every solved problem moves you up the map.

@@ -6,6 +6,7 @@ import { adminApi, type Batch, type BatchInput, type AdminUser } from "@/lib/adm
 import { apiErrorMessage } from "@/lib/api";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useConfirm } from "@/components/ui/confirm";
 import { Field, Input, Textarea } from "@/components/ui/field";
 import { Select } from "@/components/ui/select";
 import { Loading, ErrorState, EmptyState } from "@/components/ui/feedback";
@@ -14,6 +15,7 @@ import { cn } from "@/lib/cn";
 
 export default function AdminBatchesPage() {
   const qc = useQueryClient();
+  const confirm = useConfirm();
   const [editing, setEditing] = useState<Batch | "new" | null>(null);
   const [managing, setManaging] = useState<Batch | null>(null);
 
@@ -94,8 +96,16 @@ export default function AdminBatchesPage() {
                   <Button size="sm" variant="ghost" onClick={() => setEditing(b)}>Edit</Button>
                   <button
                     type="button"
-                    onClick={() => {
-                      if (confirm(`Delete "${b.name}"? Members will be unassigned.`)) del.mutate(b.id);
+                    onClick={async () => {
+                      if (
+                        await confirm({
+                          title: "Delete batch?",
+                          message: `“${b.name}” will be deleted and its members unassigned.`,
+                          confirmLabel: "Delete",
+                          tone: "danger",
+                        })
+                      )
+                        del.mutate(b.id);
                     }}
                     className="ml-auto rounded-md px-2 font-mono text-[11.5px] text-ink-mute hover:text-bad"
                   >

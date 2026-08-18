@@ -9,6 +9,7 @@ import { apiErrorMessage } from "@/lib/api";
 import { BackLink } from "@/components/ui/back-link";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useConfirm } from "@/components/ui/confirm";
 import { Loading, ErrorState, EmptyState } from "@/components/ui/feedback";
 import { IconSearch, IconFlame } from "@/components/ui/icons";
 import { cn } from "@/lib/cn";
@@ -22,6 +23,7 @@ export default function OrganizationDetailPage() {
   const [tab, setTab] = useState<Tab>("members");
   const [showInvite, setShowInvite] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const confirm = useConfirm();
 
   const { data: org, isLoading, error, refetch } = useQuery({
     queryKey: ["organization", slug],
@@ -94,8 +96,15 @@ export default function OrganizationDetailPage() {
                 variant="ghost"
                 size="sm"
                 disabled={del.isPending}
-                onClick={() => {
-                  if (confirm("Delete this organization for everyone? This can't be undone."))
+                onClick={async () => {
+                  if (
+                    await confirm({
+                      title: "Delete organization?",
+                      message: `“${org.name}” and its membership will be permanently removed for everyone. This can’t be undone.`,
+                      confirmLabel: "Delete",
+                      tone: "danger",
+                    })
+                  )
                     del.mutate();
                 }}
               >
@@ -107,8 +116,16 @@ export default function OrganizationDetailPage() {
               variant="ghost"
               size="sm"
               disabled={leave.isPending}
-              onClick={() => {
-                if (confirm("Leave this organization?")) leave.mutate();
+              onClick={async () => {
+                if (
+                  await confirm({
+                    title: "Leave organization?",
+                    message: `You’ll be removed from “${org.name}” and its leaderboard. You can rejoin only if invited again.`,
+                    confirmLabel: "Leave",
+                    tone: "danger",
+                  })
+                )
+                  leave.mutate();
               }}
             >
               Leave
@@ -207,6 +224,7 @@ function EditModal({ org, onClose }: { org: OrgDetail; onClose: () => void }) {
 
 function MembersTab({ org, slug }: { org: OrgDetail; slug: string }) {
   const qc = useQueryClient();
+  const confirm = useConfirm();
   const remove = useMutation({
     mutationFn: (userId: number) => orgApi.removeMember(slug, userId),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["organization", slug] }),
@@ -254,11 +272,13 @@ function MembersTab({ org, slug }: { org: OrgDetail; slug: string }) {
                 <button
                   type="button"
                   disabled={transfer.isPending}
-                  onClick={() => {
+                  onClick={async () => {
                     if (
-                      confirm(
-                        `Make ${m.username} the owner? You'll become a regular member.`,
-                      )
+                      await confirm({
+                        title: "Transfer ownership?",
+                        message: `${m.username} will become the owner and you’ll become a regular member. Only they will be able to transfer it back.`,
+                        confirmLabel: "Make owner",
+                      })
                     )
                       transfer.mutate(m.user_id);
                   }}
@@ -268,8 +288,15 @@ function MembersTab({ org, slug }: { org: OrgDetail; slug: string }) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    if (confirm(`Remove ${m.username} from the organization?`))
+                  onClick={async () => {
+                    if (
+                      await confirm({
+                        title: "Remove member?",
+                        message: `${m.username} will be removed from the organization and its leaderboard.`,
+                        confirmLabel: "Remove",
+                        tone: "danger",
+                      })
+                    )
                       remove.mutate(m.user_id);
                   }}
                   className="font-mono text-[12px] text-ink-mute transition-colors hover:text-bad"
@@ -304,8 +331,16 @@ function MembersTab({ org, slug }: { org: OrgDetail; slug: string }) {
                 <button
                   type="button"
                   disabled={cancelInvite.isPending}
-                  onClick={() => {
-                    if (confirm(`Cancel the invite to ${p.username}?`))
+                  onClick={async () => {
+                    if (
+                      await confirm({
+                        title: "Cancel invitation?",
+                        message: `The pending invite to ${p.username} will be withdrawn. You can invite them again later.`,
+                        confirmLabel: "Cancel invite",
+                        cancelLabel: "Keep",
+                        tone: "danger",
+                      })
+                    )
                       cancelInvite.mutate(p.id);
                   }}
                   className="font-mono text-[11px] text-ink-mute transition-colors hover:text-bad"

@@ -25,6 +25,7 @@ export function LearnerShell({ children }: { children: React.ReactNode }) {
     queryFn: orgApi.myInvitationsCount,
     enabled: !!user,
     refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
   });
   if (!user) return null;
 
@@ -51,10 +52,7 @@ export function LearnerShell({ children }: { children: React.ReactNode }) {
 
       <div className="grid flex-1 md:min-h-0 md:grid-cols-[210px_1fr] md:overflow-hidden">
         {/* sidebar */}
-        <aside className="flex flex-row flex-wrap gap-1 border-b border-line bg-surface p-3 md:flex-col md:border-r md:border-b-0 md:h-full md:overflow-y-auto">
-          <span className="hidden px-2.5 pb-1.5 pt-3 font-mono text-[10.5px] font-semibold uppercase tracking-[0.14em] text-tan md:block">
-            Learn
-          </span>
+        <aside className="flex flex-row flex-wrap gap-1 border-b border-line bg-surface p-3 md:flex-col md:border-r md:border-b-0 md:h-full md:overflow-y-auto md:pt-4">
           <NavItem href="/dashboard" label="Dashboard" icon={<IconDashboard />} />
           <NavItem href="/roadmap" label="Roadmap" icon={<IconRoadmap />} />
           <NavItem href="/leaderboard" label="Leaderboard" icon={<IconTrophy />} />
