@@ -44,7 +44,7 @@ function StatTile({
     );
   }
   return (
-    <div className="rounded-2xl border border-line bg-surface p-4 transition-[transform,box-shadow,border-color] duration-150 hover:-translate-y-0.5 hover:border-line-2 hover:shadow-[var(--shadow)]">
+    <div className="rounded-2xl border border-line bg-surface p-4">
       <div className="font-mono text-[10.5px] uppercase tracking-wider text-ink-mute">{label}</div>
       <div className="mt-1.5 flex items-center gap-2">
         <span className="text-[30px] font-extrabold tabular-nums">{value}</span>

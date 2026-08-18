@@ -29,9 +29,9 @@ export function LearnerShell({ children }: { children: React.ReactNode }) {
   if (!user) return null;
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex min-h-dvh flex-col md:h-dvh md:min-h-0 md:overflow-hidden">
       {/* top bar */}
-      <header className="flex items-center gap-3 border-b border-line bg-surface px-4 py-3">
+      <header className="flex shrink-0 items-center gap-3 border-b border-line bg-surface px-4 py-3">
         <Logo />
         <div className="flex-1" />
         <span className="bg-brand-grad brand-glow-sm inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[13px] font-semibold text-white">
@@ -45,13 +45,13 @@ export function LearnerShell({ children }: { children: React.ReactNode }) {
           aria-label="Your profile"
           className="rounded-full outline-offset-2 transition-[box-shadow] hover:shadow-[0_0_0_2px_var(--ember-line)]"
         >
-          <Avatar name={user.full_name || user.username} />
+          <Avatar name={user.full_name || user.username} src={user.avatar} />
         </Link>
       </header>
 
-      <div className="grid flex-1 md:grid-cols-[210px_1fr]">
+      <div className="grid flex-1 md:min-h-0 md:grid-cols-[210px_1fr] md:overflow-hidden">
         {/* sidebar */}
-        <aside className="flex flex-row flex-wrap gap-1 border-b border-line bg-surface p-3 md:flex-col md:border-r md:border-b-0">
+        <aside className="flex flex-row flex-wrap gap-1 border-b border-line bg-surface p-3 md:flex-col md:border-r md:border-b-0 md:h-full md:overflow-y-auto">
           <span className="hidden px-2.5 pb-1.5 pt-3 font-mono text-[10.5px] font-semibold uppercase tracking-[0.14em] text-tan md:block">
             Learn
           </span>
@@ -69,7 +69,7 @@ export function LearnerShell({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={logout}
-            className="flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-sm font-medium text-ink-dim transition-colors hover:bg-ground hover:text-ink"
+            className="flex items-center gap-3 rounded-[10px] border border-line-2 bg-elevated px-3 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-bad hover:bg-bad-soft hover:text-bad"
           >
             <IconLogout className="size-[17px]" />
             <span className="hidden md:inline">Sign out</span>
@@ -77,7 +77,7 @@ export function LearnerShell({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* content */}
-        <main className="min-w-0 p-4 sm:p-6">{children}</main>
+        <main className="min-w-0 p-4 sm:p-6 md:h-full md:overflow-y-auto">{children}</main>
       </div>
     </div>
   );
