@@ -54,12 +54,12 @@ export function ResultPanel({
         <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[12px] font-semibold", TONE[meta.tone])}>
           {meta.label}
         </span>
-        {submission ? (
+        {done ? (
           <span className="font-mono text-[13px] text-ink-dim">
-            {submission.passed_count} / {submission.total_count} passed
+            {submission!.passed_count} / {submission!.total_count} passed
           </span>
         ) : (
-          <span className="font-mono text-[13px] text-tan">running…</span>
+          <span className="font-mono text-[13px] text-tan">judging…</span>
         )}
         {submission && submission.mode === "submit" && submission.score_awarded > 0 ? (
           <span className="ml-auto font-mono text-[13px] font-semibold text-ember">
@@ -96,8 +96,9 @@ export function ResultPanel({
         </div>
       ) : null}
 
-      {/* per-sample detail (run only reveals I/O) */}
-      {isRun && submission ? (
+      {/* per-sample detail (run only reveals I/O) — only once judging is finished,
+          so half-evaluated cases don't flash "failed" mid-run. */}
+      {isRun && done && submission ? (
         <div className="border-t border-line">
           {submission.results.map((r) => (
             <details key={r.index} className="border-b border-line last:border-b-0">
