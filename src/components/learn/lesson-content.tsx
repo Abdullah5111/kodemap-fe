@@ -145,7 +145,7 @@ const NOTE_STYLE = {
 } as const;
 
 // ---- inline exercise (self-fetching) --------------------------------------
-function LessonExercise({ slug }: { slug: string }) {
+export function InlineExercise({ slug }: { slug: string }) {
   const { trackSlug } = useLessonLang();
   const qc = useQueryClient();
   const { refresh } = useAuth();
@@ -210,7 +210,7 @@ export function LessonBlocks({ blocks }: { blocks: LessonBlock[] }) {
           case "code":
             return <TabbedCode key={i} variants={b.variants} note={b.note} />;
           case "exercise":
-            return <LessonExercise key={i} slug={b.slug} />;
+            return <InlineExercise key={i} slug={b.slug} />;
           default:
             return null;
         }

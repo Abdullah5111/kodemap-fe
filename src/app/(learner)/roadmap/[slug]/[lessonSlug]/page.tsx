@@ -15,7 +15,12 @@ import {
   IconArrowRight,
   IconBook,
 } from "@/components/ui/icons";
-import { LessonLangProvider, LangTabs, LessonBlocks } from "@/components/learn/lesson-content";
+import {
+  LessonLangProvider,
+  LangTabs,
+  LessonBlocks,
+  InlineExercise,
+} from "@/components/learn/lesson-content";
 import { Confetti } from "@/components/learn/confetti";
 import { cn } from "@/lib/cn";
 
@@ -86,12 +91,33 @@ export default function LessonPage() {
           </header>
 
           <LessonLangProvider blocks={lesson.content} trackSlug={slug}>
-            <div className="mt-5">
-              <LangTabs />
-            </div>
+            {lesson.content.some((b) => b.t === "code") ? (
+              <div className="mt-5">
+                <LangTabs />
+              </div>
+            ) : null}
             <div className="mt-5">
               <LessonBlocks blocks={lesson.content} />
             </div>
+
+            {/* Drills that aren't embedded in the theory (e.g. legacy lessons with
+                no content yet) still render, so every lesson is usable. */}
+            {(() => {
+              const embedded = new Set(
+                lesson.content.filter((b) => b.t === "exercise").map((b) => (b as { slug: string }).slug),
+              );
+              const extras = lesson.questions.filter(
+                (q) => q.kind === "exercise" && !embedded.has(q.slug),
+              );
+              if (!extras.length) return null;
+              return (
+                <div className="mt-5 flex flex-col gap-5">
+                  {extras.map((q) => (
+                    <InlineExercise key={q.id} slug={q.slug} />
+                  ))}
+                </div>
+              );
+            })()}
           </LessonLangProvider>
 
           <ChallengeCard lesson={lesson} />
