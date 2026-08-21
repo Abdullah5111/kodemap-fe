@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { BackLink } from "@/components/ui/back-link";
 import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/components/auth-provider";
 import {
   solveApi,
   isTerminal,
@@ -30,6 +31,8 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export default function SolvePage() {
   const { slug } = useParams<{ slug: string }>();
+  const qc = useQueryClient();
+  const { refresh: refreshUser } = useAuth();
 
   const { data: q, isLoading, error, refetch } = useQuery({
     queryKey: ["solve-question", slug],
@@ -138,6 +141,11 @@ export default function SolvePage() {
         setRunError("Judging is taking longer than usual. Please try again.");
       } else if (mode === "submit" && sub.status === "accepted") {
         void refetch();
+        // Solving updates the streak/score server-side — refresh the cached user
+        // and stats so the navbar and dashboard reflect it without a page reload.
+        void refreshUser();
+        qc.invalidateQueries({ queryKey: ["my-stats"] });
+        qc.invalidateQueries({ queryKey: ["roadmap"] });
       }
     } catch (err) {
       setRunError(apiErrorMessage(err, "Couldn't run your code."));
@@ -162,7 +170,9 @@ export default function SolvePage() {
 
   return (
     <div>
-      <BackLink href="/roadmap">Roadmap</BackLink>
+      <BackLink href={q.track_slug ? `/roadmap/${q.track_slug}` : "/roadmap"}>
+        {q.track_title ?? "Roadmap"}
+      </BackLink>
 
       {locked ? (
         <div className="mt-3 flex items-start gap-3 rounded-xl border border-line border-l-[3px] border-l-ink-mute bg-surface px-4 py-3">

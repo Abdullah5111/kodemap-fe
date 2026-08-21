@@ -252,7 +252,7 @@ function MembersTab({ org, slug }: { org: OrgDetail; slug: string }) {
             key={m.user_id}
             className="flex items-center gap-3 border-b border-line px-4 py-3 last:border-b-0"
           >
-            <Avatar name={m.full_name || m.username} className="size-8" />
+            <Avatar name={m.full_name || m.username} src={m.avatar} className="size-8" />
             <div className="min-w-0 flex-1">
               <div className="truncate text-[14px] font-medium">
                 {m.username}

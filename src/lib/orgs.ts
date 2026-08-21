@@ -17,6 +17,7 @@ export interface OrgMember {
   user_id: number;
   username: string;
   full_name: string;
+  avatar: string | null;
   role: OrgRole;
   joined_at: string;
 }

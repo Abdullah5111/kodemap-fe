@@ -77,6 +77,9 @@ export interface QuestionDetail {
   stubs: CodeStub[];
   /** Slug of the next question in roadmap order, or null if this is the last. */
   next_slug: string | null;
+  /** The track this question belongs to (for the back link), or null if standalone. */
+  track_slug: string | null;
+  track_title: string | null;
 }
 
 export type SubmissionStatus =

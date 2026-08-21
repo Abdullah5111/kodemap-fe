@@ -6,12 +6,22 @@ import { contentApi, type TrackCategory } from "@/lib/content";
 import { apiErrorMessage } from "@/lib/api";
 import { Loading, ErrorState, EmptyState } from "@/components/ui/feedback";
 import { PageHeader } from "@/components/ui/page-header";
-import { IconRoadmap } from "@/components/ui/icons";
+import { IconFlame, IconTests, IconTrophy } from "@/components/ui/icons";
 
 const CATEGORY_LABEL: Record<TrackCategory, string> = {
   beginner: "Beginner",
   dsa: "DSA Foundation",
   competitive: "Competitive",
+};
+
+// A distinct icon + accent per category so the cards don't all look the same.
+const CATEGORY_META: Record<
+  TrackCategory,
+  { icon: React.ReactNode; tile: string }
+> = {
+  beginner: { icon: <IconFlame className="size-[18px]" />, tile: "bg-tan-soft text-tan" },
+  dsa: { icon: <IconTests className="size-[18px]" />, tile: "bg-ember-soft text-ember" },
+  competitive: { icon: <IconTrophy className="size-[18px]" />, tile: "bg-warn-soft text-warn" },
 };
 
 export default function RoadmapPage() {
@@ -44,11 +54,13 @@ export default function RoadmapPage() {
               <Link
                 key={track.id}
                 href={`/roadmap/${track.slug}`}
-                className="group flex flex-col rounded-2xl border border-line bg-surface p-5 transition-colors hover:border-line-2"
+                className="group flex flex-col rounded-2xl border border-line bg-surface p-5 transition-colors hover:border-line-2 hover:bg-elevated"
               >
                 <div className="flex items-center justify-between">
-                  <span className="grid size-9 place-items-center rounded-[10px] bg-elevated text-tan">
-                    <IconRoadmap className="size-[18px]" />
+                  <span
+                    className={`grid size-9 place-items-center rounded-[10px] ${CATEGORY_META[track.category].tile}`}
+                  >
+                    {CATEGORY_META[track.category].icon}
                   </span>
                   <span className="rounded-md border border-line px-2 py-0.5 font-mono text-[11px] text-ink-mute">
                     {CATEGORY_LABEL[track.category]}
