@@ -1,7 +1,7 @@
 import { api } from "./api";
 import type { LeaderboardEntry } from "./stats";
 
-export type OrgRole = "owner" | "member";
+export type OrgRole = "owner" | "admin" | "member";
 
 export interface OrgSummary {
   id: number;
@@ -80,6 +80,10 @@ export const orgApi = {
   leave: (slug: string) => api.post(`/organizations/${slug}/leave`),
   removeMember: (slug: string, userId: number) =>
     api.delete(`/organizations/${slug}/members/${userId}`),
+  setMemberRole: (slug: string, userId: number, role: "admin" | "member") =>
+    api
+      .post<OrgDetail>(`/organizations/${slug}/members/${userId}/role`, { role })
+      .then((r) => r.data),
   transferOwnership: (slug: string, userId: number) =>
     api.post<OrgDetail>(`/organizations/${slug}/transfer`, { user_id: userId }).then((r) => r.data),
   leaderboard: (slug: string) =>

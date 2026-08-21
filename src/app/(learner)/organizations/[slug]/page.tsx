@@ -69,7 +69,11 @@ export default function OrganizationDetailPage() {
             <span
               className={cn(
                 "rounded-full px-2 py-0.5 font-mono text-[10.5px] font-semibold",
-                org.is_owner ? "bg-ember-soft text-ember" : "bg-elevated text-ink-dim",
+                org.my_role === "owner"
+                  ? "bg-ember-soft text-ember"
+                  : org.my_role === "admin"
+                    ? "bg-tan-soft text-tan"
+                    : "bg-elevated text-ink-dim",
               )}
             >
               {org.my_role}
@@ -84,9 +88,11 @@ export default function OrganizationDetailPage() {
           ) : null}
         </div>
         <div className="flex gap-2">
-          <Button size="sm" onClick={() => setShowInvite(true)}>
-            Invite
-          </Button>
+          {org.my_role === "owner" || org.my_role === "admin" ? (
+            <Button size="sm" onClick={() => setShowInvite(true)}>
+              Invite
+            </Button>
+          ) : null}
           {org.is_owner ? (
             <>
               <Button variant="ghost" size="sm" onClick={() => setShowEdit(true)}>
@@ -233,6 +239,11 @@ function MembersTab({ org, slug }: { org: OrgDetail; slug: string }) {
     mutationFn: (userId: number) => orgApi.transferOwnership(slug, userId),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["organization", slug] }),
   });
+  const setRole = useMutation({
+    mutationFn: ({ userId, role }: { userId: number; role: "admin" | "member" }) =>
+      orgApi.setMemberRole(slug, userId, role),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["organization", slug] }),
+  });
   const cancelInvite = useMutation({
     mutationFn: (id: number) => orgApi.cancelInvite(slug, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["org-invites", slug] }),
@@ -262,7 +273,11 @@ function MembersTab({ org, slug }: { org: OrgDetail; slug: string }) {
             <span
               className={cn(
                 "rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold",
-                m.role === "owner" ? "bg-ember-soft text-ember" : "bg-elevated text-ink-dim",
+                m.role === "owner"
+                  ? "bg-ember-soft text-ember"
+                  : m.role === "admin"
+                    ? "bg-tan-soft text-tan"
+                    : "bg-elevated text-ink-dim",
               )}
             >
               {m.role}
@@ -271,20 +286,41 @@ function MembersTab({ org, slug }: { org: OrgDetail; slug: string }) {
               <>
                 <button
                   type="button"
+                  disabled={setRole.isPending}
+                  onClick={async () => {
+                    const toAdmin = m.role !== "admin";
+                    if (
+                      await confirm({
+                        title: toAdmin ? "Make admin?" : "Revoke admin?",
+                        message: toAdmin
+                          ? `${m.username} will be able to invite people to the organization. They won’t be able to remove members, edit, or delete it — only you can.`
+                          : `${m.username} will go back to a regular member and can no longer invite people.`,
+                        confirmLabel: toAdmin ? "Make admin" : "Revoke admin",
+                      })
+                    )
+                      setRole.mutate({ userId: m.user_id, role: toAdmin ? "admin" : "member" });
+                  }}
+                  className="font-mono text-[12px] text-ink-mute transition-colors hover:text-tan"
+                >
+                  {m.role === "admin" ? "revoke admin" : "make admin"}
+                </button>
+                <button
+                  type="button"
                   disabled={transfer.isPending}
                   onClick={async () => {
                     if (
                       await confirm({
                         title: "Transfer ownership?",
-                        message: `${m.username} will become the owner and you’ll become a regular member. Only they will be able to transfer it back.`,
-                        confirmLabel: "Make owner",
+                        message: `${m.username} will become the owner and you’ll become a regular member. Only they will be able to transfer it back. This is not the same as making them an admin.`,
+                        confirmLabel: "Transfer ownership",
+                        tone: "danger",
                       })
                     )
                       transfer.mutate(m.user_id);
                   }}
                   className="font-mono text-[12px] text-ink-mute transition-colors hover:text-ember"
                 >
-                  make owner
+                  transfer ownership
                 </button>
                 <button
                   type="button"

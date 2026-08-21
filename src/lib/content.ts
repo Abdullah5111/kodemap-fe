@@ -34,6 +34,8 @@ export interface TrackSummary {
   sort_order: number;
   module_count: number;
   question_count: number;
+  solved_count: number;
+  is_complete: boolean;
 }
 
 export type QuestionState = "solved" | "current" | "locked" | "optional";
