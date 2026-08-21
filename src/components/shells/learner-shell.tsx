@@ -4,9 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useAuth } from "@/components/auth-provider";
 import { orgApi } from "@/lib/orgs";
+import { statsApi } from "@/lib/stats";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Avatar } from "@/components/ui/avatar";
+import { AchievementWatcher } from "@/components/learn/achievements";
 import { NavItem } from "./nav-item";
 import {
   IconDashboard,
@@ -14,6 +16,7 @@ import {
   IconTrophy,
   IconUsers,
   IconFlame,
+  IconBolt,
   IconList,
   IconLogout,
 } from "@/components/ui/icons";
@@ -27,6 +30,11 @@ export function LearnerShell({ children }: { children: React.ReactNode }) {
     refetchInterval: 60_000,
     refetchOnWindowFocus: true,
   });
+  const { data: stats } = useQuery({
+    queryKey: ["my-stats"],
+    queryFn: statsApi.myStats,
+    enabled: !!user,
+  });
   if (!user) return null;
 
   return (
@@ -35,6 +43,15 @@ export function LearnerShell({ children }: { children: React.ReactNode }) {
       <header className="flex shrink-0 items-center gap-3 border-b border-line bg-surface px-4 py-3">
         <Logo />
         <div className="flex-1" />
+        {stats ? (
+          <span
+            className="inline-flex items-center gap-1.5 rounded-full border border-ember-line bg-ember-soft px-3 py-1.5 font-mono text-[13px] font-semibold text-ember"
+            title={`${stats.xp_into_level} / ${stats.xp_for_next} XP to next level`}
+          >
+            <IconBolt className="size-[14px]" />
+            LVL {stats.level}
+          </span>
+        ) : null}
         <span className="bg-brand-grad brand-glow-sm inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[13px] font-semibold text-white">
           <IconFlame className="size-[15px]" />
           {user.streak_count}
@@ -77,6 +94,8 @@ export function LearnerShell({ children }: { children: React.ReactNode }) {
         {/* content */}
         <main className="min-w-0 p-4 sm:p-6 md:h-full md:overflow-y-auto">{children}</main>
       </div>
+
+      <AchievementWatcher />
     </div>
   );
 }

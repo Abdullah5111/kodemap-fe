@@ -4,14 +4,18 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useQuery } from "@tanstack/react-query";
 import { authApi } from "@/lib/auth-api";
 import { apiErrorMessage } from "@/lib/api";
+import { statsApi } from "@/lib/stats";
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { Field, Input, Textarea } from "@/components/ui/field";
 import { Select } from "@/components/ui/select";
 import { Avatar } from "@/components/ui/avatar";
+import { XpBar } from "@/components/ui/xp-bar";
+import { BadgeShelf } from "@/components/learn/achievements";
 import { Loading } from "@/components/ui/feedback";
 import { IconFlame, IconCheck } from "@/components/ui/icons";
 
@@ -47,6 +51,7 @@ const MAX_AVATAR_MB = 3;
 
 export default function ProfilePage() {
   const { user, loading, refresh } = useAuth();
+  const { data: stats } = useQuery({ queryKey: ["my-stats"], queryFn: statsApi.myStats });
   const fileRef = useRef<HTMLInputElement>(null);
   const [saved, setSaved] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -178,6 +183,40 @@ export default function ProfilePage() {
           <p className="mt-1 font-mono text-[11px] text-ink-mute">
             PNG or JPG, up to {MAX_AVATAR_MB}MB. Email and username can&apos;t be changed.
           </p>
+        </div>
+      </div>
+
+      {/* level + achievements */}
+      <div className="mt-4 grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+        <div className="rounded-2xl border border-line bg-surface p-5">
+          <h3 className="text-[15px] font-bold">Your level</h3>
+          {stats ? (
+            <>
+              <XpBar
+                className="mt-3"
+                level={stats.level}
+                into={stats.xp_into_level}
+                span={stats.xp_for_next}
+              />
+              <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                {[
+                  { v: stats.xp, l: "total XP" },
+                  { v: stats.solved, l: "solved" },
+                  { v: stats.streak, l: "streak" },
+                ].map((s) => (
+                  <div key={s.l} className="rounded-xl border border-line bg-ground py-2.5">
+                    <div className="font-mono text-[18px] font-bold tabular-nums text-ink">{s.v}</div>
+                    <div className="font-mono text-[10px] uppercase tracking-wider text-ink-mute">{s.l}</div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="mt-3 text-[13px] text-ink-mute">Loading…</p>
+          )}
+        </div>
+        <div className="rounded-2xl border border-line bg-surface p-5">
+          <BadgeShelf />
         </div>
       </div>
 

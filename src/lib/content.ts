@@ -45,6 +45,7 @@ export interface RoadmapQuestion {
   id: number;
   title: string;
   slug: string;
+  kind: "code" | "exercise";
   difficulty: Difficulty;
   score: number;
   is_required: boolean;
@@ -53,11 +54,23 @@ export interface RoadmapQuestion {
   is_unlocked: boolean;
 }
 
+/** A block of W3Schools-style lesson theory. `code` variants are keyed by the
+    canonical language name (python | cpp | javascript | java) and switch with
+    the lesson's global language tab; `exercise` embeds a drill by slug. */
+export type LessonBlock =
+  | { t: "p"; md: string }
+  | { t: "h"; text: string }
+  | { t: "note"; tone: "tip" | "note" | "warn"; md: string }
+  | { t: "code"; variants: Record<string, string>; note?: string }
+  | { t: "exercise"; slug: string };
+
 export interface RoadmapLesson {
   id: number;
   title: string;
+  slug: string;
   description: string;
   sort_order: number;
+  content: LessonBlock[];
   question_count: number;
   required_count: number;
   questions: RoadmapQuestion[];

@@ -35,6 +35,10 @@ export interface RecentSubmission {
 
 export interface MyStats {
   score: number;
+  xp: number;
+  level: number;
+  xp_into_level: number;
+  xp_for_next: number;
   solved: number;
   attempted: number;
   rank: number | null;
@@ -45,6 +49,24 @@ export interface MyStats {
   recent_submissions: RecentSubmission[];
 }
 
+export type BadgeTier = "bronze" | "silver" | "gold";
+
+export interface Badge {
+  code: string;
+  name: string;
+  description: string;
+  icon: string;
+  tier: BadgeTier;
+  earned: boolean;
+  earned_at: string | null;
+}
+
+export interface MyBadges {
+  badges: Badge[];
+  earned_count: number;
+  total: number;
+}
+
 export const statsApi = {
   leaderboard: (scope: "global" | "batch" = "global") =>
     api
@@ -53,6 +75,7 @@ export const statsApi = {
       })
       .then((r) => r.data),
   myStats: () => api.get<MyStats>("/me/stats").then((r) => r.data),
+  myBadges: () => api.get<MyBadges>("/me/badges").then((r) => r.data),
 };
 
 /** "3m ago" style relative time from an ISO string. */

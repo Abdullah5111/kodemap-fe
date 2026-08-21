@@ -19,6 +19,7 @@ import {
   type Submission,
 } from "@/lib/solve";
 import { apiErrorMessage } from "@/lib/api";
+import { cn } from "@/lib/cn";
 import { DifficultyBadge, Tag } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loading, ErrorState } from "@/components/ui/feedback";
@@ -141,11 +142,14 @@ export default function SolvePage() {
         setRunError("Judging is taking longer than usual. Please try again.");
       } else if (mode === "submit" && sub.status === "accepted") {
         void refetch();
-        // Solving updates the streak/score server-side — refresh the cached user
-        // and stats so the navbar and dashboard reflect it without a page reload.
+        // Solving updates the streak/score/badges server-side — refresh the cached
+        // user and stats so the navbar, dashboard, roadmap and achievements reflect
+        // it without a page reload (invalidating ["badges"] lets the watcher toast).
         void refreshUser();
         qc.invalidateQueries({ queryKey: ["my-stats"] });
         qc.invalidateQueries({ queryKey: ["roadmap"] });
+        qc.invalidateQueries({ queryKey: ["badges"] });
+        if (q.track_slug) qc.invalidateQueries({ queryKey: ["track", q.track_slug] });
       }
     } catch (err) {
       setRunError(apiErrorMessage(err, "Couldn't run your code."));
@@ -302,26 +306,29 @@ export default function SolvePage() {
         ) : (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col overflow-hidden rounded-2xl border border-line bg-surface">
-            <div className="flex items-center gap-2 border-b border-line bg-elevated px-3 py-2">
-              <select
-                value={langId ?? ""}
-                onChange={(e) => selectLang(Number(e.target.value))}
-                className="rounded-md border border-line bg-ground px-2.5 py-1.5 font-mono text-[12.5px] text-ink outline-none"
-              >
+            <div className="flex items-center gap-1 border-b border-line bg-elevated px-2 py-1.5">
+              <div className="flex flex-1 gap-1 overflow-x-auto">
                 {langs.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.name} {l.version}
-                  </option>
+                  <button
+                    key={l.id}
+                    type="button"
+                    onClick={() => selectLang(l.id)}
+                    className={cn(
+                      "shrink-0 rounded-md px-3 py-1.5 font-mono text-[12.5px] font-semibold transition-colors",
+                      l.id === langId
+                        ? "bg-brand-grad-btn text-white"
+                        : "text-ink-mute hover:bg-ground hover:text-ink",
+                    )}
+                  >
+                    {l.name}
+                  </button>
                 ))}
-              </select>
-              <span className="ml-auto font-mono text-[11px] text-ink-mute">
-                {language ? monacoLang(language.name) : ""}
-              </span>
+              </div>
               <button
                 type="button"
                 onClick={resetToStarter}
                 title="Discard your draft and restore the starter code"
-                className="font-mono text-[11px] text-ink-mute transition-colors hover:text-ember"
+                className="shrink-0 px-2 font-mono text-[11px] text-ink-mute transition-colors hover:text-ember"
               >
                 Reset
               </button>

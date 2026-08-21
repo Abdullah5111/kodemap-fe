@@ -4,135 +4,92 @@ import Link from "next/link";
 import { BackLink } from "@/components/ui/back-link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import {
-  contentApi,
-  type RoadmapLesson,
-  type RoadmapQuestion,
-  type LessonState,
-} from "@/lib/content";
+import { contentApi, type RoadmapLesson, type LessonState } from "@/lib/content";
 import { apiErrorMessage } from "@/lib/api";
 import { Loading, ErrorState } from "@/components/ui/feedback";
-import { DifficultyBadge } from "@/components/ui/badge";
-import { IconCheck, IconLock, IconArrowRight } from "@/components/ui/icons";
+import { IconCheck, IconLock, IconArrowRight, IconChevronRight, IconBook } from "@/components/ui/icons";
 import { cn } from "@/lib/cn";
 
-// --- lesson header status chip ---------------------------------------------
 const LESSON_CHIP: Record<LessonState, { label: string; cls: string }> = {
-  complete: { label: "Complete", cls: "text-ok bg-ok-soft" },
+  complete: { label: "Done", cls: "text-ok bg-ok-soft" },
   current: { label: "In progress", cls: "text-ember bg-ember-soft" },
   locked: { label: "Locked", cls: "text-ink-mute bg-elevated" },
   open: { label: "Bonus", cls: "text-tan bg-tan-soft" },
 };
 
-function LessonChip({ state }: { state: LessonState }) {
-  const c = LESSON_CHIP[state];
-  return (
-    <span className={cn("rounded-full px-2.5 py-0.5 font-mono text-[10.5px] font-semibold", c.cls)}>
-      {c.label}
-    </span>
-  );
+function LessonNode({ state }: { state: LessonState }) {
+  if (state === "complete")
+    return (
+      <span className="grid size-8 place-items-center rounded-full bg-ok-soft text-ok">
+        <IconCheck className="size-[17px]" />
+      </span>
+    );
+  if (state === "locked")
+    return (
+      <span className="grid size-8 place-items-center rounded-full bg-elevated text-ink-mute">
+        <IconLock className="size-[15px]" />
+      </span>
+    );
+  if (state === "current")
+    return (
+      <span className="bg-brand-grad brand-glow-sm grid size-8 place-items-center rounded-full text-white">
+        <IconArrowRight className="size-[17px]" />
+      </span>
+    );
+  return <span className="grid size-8 place-items-center rounded-full border border-dashed border-line-2 text-tan"><IconBook className="size-[15px]" /></span>;
 }
 
-// --- a single question row --------------------------------------------------
-function QuestionRow({ q }: { q: RoadmapQuestion }) {
-  const locked = q.state === "locked";
-
-  const marker =
-    q.state === "solved" ? (
-      <span className="grid size-5 place-items-center rounded-full bg-ok-soft text-ok">
-        <IconCheck className="size-[13px]" />
-      </span>
-    ) : locked ? (
-      <span className="grid size-5 place-items-center rounded-full bg-elevated text-ink-mute">
-        <IconLock className="size-[12px]" />
-      </span>
-    ) : q.state === "current" ? (
-      <span className="grid size-5 place-items-center rounded-full bg-ember text-ground">
-        <IconArrowRight className="size-[13px]" />
-      </span>
-    ) : (
-      <span className="size-5 rounded-full border border-dashed border-line-2" />
-    );
+function LessonRow({ slug, lesson, last }: { slug: string; lesson: RoadmapLesson; last: boolean }) {
+  const solved = lesson.questions.filter((q) => q.is_solved && q.is_required).length;
+  const total = lesson.required_count;
+  const chip = LESSON_CHIP[lesson.state];
+  const locked = lesson.state === "locked";
 
   const inner = (
     <>
-      {marker}
-      <span className={cn("flex-1", q.state === "solved" && "text-ink-dim")}>{q.title}</span>
-      {!q.is_required ? (
-        <span className="rounded border border-line px-1.5 py-0.5 font-mono text-[10px] text-tan">
-          bonus
-        </span>
+      {/* node + connector rail */}
+      <div className="relative flex flex-col items-center">
+        <LessonNode state={lesson.state} />
+        {!last ? <span className="absolute top-8 h-[calc(100%-0px)] w-px bg-line" /> : null}
+      </div>
+      <div className="min-w-0 flex-1 pb-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className={cn("text-[15px] font-semibold", !locked && "group-hover:text-ember")}>
+            {lesson.title}
+          </span>
+          <span className={cn("rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold", chip.cls)}>
+            {chip.label}
+          </span>
+        </div>
+        {lesson.description ? (
+          <p className="mt-0.5 text-[12.5px] text-ink-mute">{lesson.description}</p>
+        ) : null}
+        {total > 0 ? (
+          <div className="mt-1 font-mono text-[11px] text-ink-mute tabular-nums">
+            {solved}/{total} steps done
+          </div>
+        ) : null}
+      </div>
+      {!locked ? (
+        <IconChevronRight className="mt-1 size-4 shrink-0 text-ink-mute transition-colors group-hover:text-ember" />
       ) : null}
-      <DifficultyBadge difficulty={q.difficulty} />
     </>
   );
 
   if (locked) {
     return (
-      <div
-        className="flex cursor-not-allowed items-center gap-2.5 rounded-lg border border-line bg-ground/40 px-3 py-2 text-[13.5px] text-ink-mute"
-        title="Solve the previous question to unlock this one"
-      >
+      <div className="flex cursor-not-allowed gap-3.5 px-5 py-3 opacity-70" title="Finish the earlier lessons to unlock this">
         {inner}
       </div>
     );
   }
-
   return (
     <Link
-      href={`/questions/${q.slug}`}
-      className={cn(
-        "flex items-center gap-2.5 rounded-lg border px-3 py-2 text-[13.5px] transition-colors hover:text-ember",
-        q.state === "current"
-          ? "border-ember-line bg-ember-soft/40 hover:border-ember-line"
-          : "border-line bg-ground hover:border-line-2",
-      )}
+      href={`/roadmap/${slug}/${lesson.slug}`}
+      className="group flex gap-3.5 px-5 py-3 transition-colors hover:bg-elevated"
     >
       {inner}
     </Link>
-  );
-}
-
-function LessonBlock({ lesson }: { lesson: RoadmapLesson }) {
-  const solved = lesson.questions.filter((q) => q.is_solved && q.is_required).length;
-  const total = lesson.required_count;
-
-  return (
-    <div className="border-b border-line px-5 py-3 last:border-b-0">
-      <div className="flex items-center gap-3">
-        <span
-          className={cn(
-            "size-2 rounded-full",
-            lesson.state === "complete"
-              ? "bg-ok"
-              : lesson.state === "current"
-                ? "bg-ember"
-                : "bg-line-2",
-          )}
-        />
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <span className="text-[14px]">{lesson.title}</span>
-            <LessonChip state={lesson.state} />
-          </div>
-          {lesson.description ? (
-            <p className="text-[12px] text-ink-mute">{lesson.description}</p>
-          ) : null}
-        </div>
-        <span className="font-mono text-[12px] text-ink-mute tabular-nums">
-          {total > 0 ? `${solved}/${total}` : `${lesson.question_count}`}{" "}
-          {total > 0 ? "solved" : lesson.question_count === 1 ? "question" : "questions"}
-        </span>
-      </div>
-
-      {lesson.questions.length > 0 ? (
-        <div className="mt-2.5 flex flex-col gap-1.5 pl-5">
-          {lesson.questions.map((q) => (
-            <QuestionRow key={q.id} q={q} />
-          ))}
-        </div>
-      ) : null}
-    </div>
   );
 }
 
@@ -146,52 +103,63 @@ export default function TrackTreePage() {
     enabled: !!slug,
   });
 
-  const allQuestions =
-    data?.modules.flatMap((m) => m.lessons.flatMap((l) => l.questions)) ?? [];
+  const allQuestions = data?.modules.flatMap((m) => m.lessons.flatMap((l) => l.questions)) ?? [];
   const requiredQs = allQuestions.filter((q) => q.is_required);
   const solvedCount = requiredQs.filter((q) => q.is_solved).length;
   const pct = requiredQs.length ? Math.round((solvedCount / requiredQs.length) * 100) : 0;
+  const complete = requiredQs.length > 0 && solvedCount === requiredQs.length;
 
   return (
-    <div>
+    <div className="mx-auto max-w-3xl">
       <BackLink href="/roadmap">Roadmap</BackLink>
 
       {isLoading ? (
         <Loading label="Loading track…" />
       ) : error ? (
-        <div className="mt-4">
-          <ErrorState message={apiErrorMessage(error)} onRetry={() => refetch()} />
-        </div>
+        <div className="mt-4"><ErrorState message={apiErrorMessage(error)} onRetry={() => refetch()} /></div>
       ) : !data ? null : (
         <>
-          <h1 className="mt-2 text-[clamp(22px,3vw,28px)] font-extrabold tracking-tight">{data.title}</h1>
+          <h1 className="mt-2 text-[clamp(22px,3vw,30px)] font-extrabold tracking-tight">{data.title}</h1>
           <p className="mt-2 max-w-[65ch] text-sm text-ink-dim">{data.description}</p>
 
-          {/* progress bar */}
-          <div className="mt-4 max-w-md">
-            <div className="flex items-center justify-between font-mono text-[12px] text-ink-mute">
-              <span>
-                <span className="text-ink">{solvedCount}</span> / {requiredQs.length} must-do solved
-              </span>
-              <span className="text-ember">{pct}%</span>
+          {/* progress hero */}
+          <div className="bg-brand-grad-soft brand-grad-border relative mt-5 overflow-hidden rounded-2xl p-5">
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <div className="font-mono text-[11px] uppercase tracking-wider text-ink-mute">Track progress</div>
+                <div className="mt-1 text-[26px] font-extrabold tabular-nums">
+                  <span className={complete ? "text-ok" : "text-brand-grad"}>{solvedCount}</span>
+                  <span className="text-ink-mute"> / {requiredQs.length}</span>
+                  <span className="ml-1.5 text-[15px] font-semibold text-ink-mute">must-do solved</span>
+                </div>
+              </div>
+              <div className={cn("font-mono text-[22px] font-extrabold tabular-nums", complete ? "text-ok" : "text-ember")}>
+                {pct}%
+              </div>
             </div>
-            <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-elevated">
+            <div className="mt-3 h-3 overflow-hidden rounded-full bg-elevated">
               <div
-                className="h-full rounded-full bg-ember transition-[width]"
+                className={cn("h-full rounded-full transition-[width] duration-700 ease-out", complete ? "bg-ok" : "bg-brand-grad")}
                 style={{ width: `${pct}%` }}
               />
             </div>
+            {complete ? (
+              <p className="mt-2.5 inline-flex items-center gap-1.5 font-mono text-[12px] font-semibold text-ok">
+                <IconCheck className="size-4" /> Track mastered — every challenge cleared!
+              </p>
+            ) : null}
           </div>
 
+          {/* module map */}
           <div className="mt-6 flex flex-col gap-4">
             {data.modules.map((module, mi) => (
               <div key={module.id} className="overflow-hidden rounded-2xl border border-line bg-surface">
-                <div className="flex items-center gap-3 px-5 py-4">
-                  <span className="grid size-8 place-items-center rounded-[9px] bg-elevated font-mono text-[13px] font-bold text-tan">
+                <div className="flex items-center gap-3 border-b border-line px-5 py-4">
+                  <span className="bg-brand-grad brand-glow-sm grid size-8 place-items-center rounded-[10px] font-mono text-[14px] font-bold text-white">
                     {mi + 1}
                   </span>
                   <div className="flex-1">
-                    <b className="text-[15px]">{module.title}</b>
+                    <b className="text-[15.5px]">{module.title}</b>
                     {module.description ? (
                       <p className="mt-0.5 text-[12.5px] text-ink-mute">{module.description}</p>
                     ) : null}
@@ -202,9 +170,14 @@ export default function TrackTreePage() {
                 </div>
 
                 {module.lessons.length > 0 ? (
-                  <div className="border-t border-line">
-                    {module.lessons.map((lesson) => (
-                      <LessonBlock key={lesson.id} lesson={lesson} />
+                  <div className="py-1">
+                    {module.lessons.map((lesson, li) => (
+                      <LessonRow
+                        key={lesson.id}
+                        slug={slug}
+                        lesson={lesson}
+                        last={li === module.lessons.length - 1}
+                      />
                     ))}
                   </div>
                 ) : null}
